@@ -4,12 +4,24 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
+
+
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Routes pour les catégories
+
+
+
+
+// USER 
+Route::middleware(['auth'])->group(function () {
+    Route::resource('users', UserController::class);
+});
+
 Route::resource('categories', CategoryController::class);
 Route::get('categories/{category}/products', [CategoryController::class, 'productsByCategory'])
     ->name('categories.products');
@@ -28,5 +40,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+
+
+// ROLES
+Route::resource('roles', RoleController::class);
+
 
 require __DIR__.'/auth.php';
