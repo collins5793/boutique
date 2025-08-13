@@ -1,11 +1,23 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Routes pour les catégories
+Route::resource('categories', CategoryController::class);
+Route::get('categories/{category}/products', [CategoryController::class, 'productsByCategory'])
+    ->name('categories.products');
+
+// Routes pour les produits
+Route::resource('products', ProductController::class);
+Route::get('products-search', [ProductController::class, 'index'])
+    ->name('products.search');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
