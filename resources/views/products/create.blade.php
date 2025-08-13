@@ -59,19 +59,6 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="sku" class="form-label">SKU *</label>
-                    <input type="text" class="form-control" id="sku" name="sku" 
-                           value="{{ old('sku', $product->sku ?? '') }}" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="barcode" class="form-label">Code-barres</label>
-                    <input type="text" class="form-control" id="barcode" name="barcode" 
-                           value="{{ old('barcode', $product->barcode ?? '') }}">
-                </div>
-            </div>
 
             <div class="col-md-6">
                 <div class="mb-3">

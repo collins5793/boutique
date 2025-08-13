@@ -30,40 +30,45 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:191',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'discount_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'sku' => 'required|string|max:50|unique:products',
-            'barcode' => 'nullable|string|max:100',
-            'image' => 'nullable|image|max:2048',
-            'gallery.*' => 'nullable|image|max:2048',
-            'status' => 'required|in:active,inactive'
-        ]);
+{
+    $request->validate([
+        'category_id' => 'required|exists:categories,id',
+        'name' => 'required|string|max:191',
+        'description' => 'nullable|string',
+        'price' => 'required|numeric|min:0',
+        'discount_price' => 'nullable|numeric|min:0',
+        'stock_quantity' => 'required|integer|min:0',
+        'image' => 'nullable|image|max:2048',
+        'gallery.*' => 'nullable|image|max:2048',
+        'status' => 'required|in:active,inactive'
+    ]);
 
-        $data = $request->except(['image', 'gallery']);
-        $data['slug'] = Str::slug($request->name);
+    $data = $request->except(['image', 'gallery']);
+    $data['slug'] = Str::slug($request->name);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
+    // ✅ Génération d’un barcode unique prod-XXXXXXXXXX
+    do {
+        $barcode = 'prod-' . Str::upper(Str::random(10)); // 10 caractères aléatoires
+    } while (Product::where('barcode', $barcode)->exists());
 
-        if ($request->hasFile('gallery')) {
-            $gallery = [];
-            foreach ($request->file('gallery') as $file) {
-                $gallery[] = $file->store('products/gallery', 'public');
-            }
-            $data['gallery'] = json_encode($gallery);
-        }
+    $data['barcode'] = $barcode;
 
-        Product::create($data);
-
-        return redirect()->route('products.index')->with('success', 'Produit créé avec succès');
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('products', 'public');
     }
+
+    if ($request->hasFile('gallery')) {
+        $gallery = [];
+        foreach ($request->file('gallery') as $file) {
+            $gallery[] = $file->store('products/gallery', 'public');
+        }
+        $data['gallery'] = json_encode($gallery);
+    }
+
+    Product::create($data);
+
+    return redirect()->route('products.index')->with('success', 'Produit créé avec succès');
+}
 
     public function show(Product $product)
     {
@@ -85,8 +90,6 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'discount_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
-            'sku' => 'required|string|max:50|unique:products,sku,'.$product->id,
-            'barcode' => 'nullable|string|max:100',
             'image' => 'nullable|image|max:2048',
             'gallery.*' => 'nullable|image|max:2048',
             'status' => 'required|in:active,inactive'
@@ -136,6 +139,22 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Produit mis à jour avec succès');
     }
+
+
+    public function getActiveProductsByCategory()
+{
+    $categories = Category::with([
+        'subcategories.products' => function ($query) {
+            $query->where('status', 'active');
+        },
+        'products' => function ($query) {
+            $query->where('status', 'active');
+        }
+    ])->whereNull('parent_id')->get();
+
+    return view('shop.products_by_category', compact('categories'));
+}
+
 
     public function destroy(Product $product)
     {

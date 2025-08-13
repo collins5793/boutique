@@ -20,8 +20,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('discount_price', 10, 2)->nullable();
             $table->integer('stock_quantity')->default(0);
-            $table->string('sku', 50)->unique();
-            $table->string('barcode', 100)->nullable();
+            $table->string('barcode', 100)->unique();
             $table->string('image', 191)->nullable();
             $table->json('gallery')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
