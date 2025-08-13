@@ -26,10 +26,18 @@ Route::resource('categories', CategoryController::class);
 Route::get('categories/{category}/products', [CategoryController::class, 'productsByCategory'])
     ->name('categories.products');
 
+
+    
+
 // Routes pour les produits
 Route::resource('products', ProductController::class);
 Route::get('products-search', [ProductController::class, 'index'])
     ->name('products.search');
+
+Route::get('/shop', [ProductController::class, 'getActiveProductsByCategory'])->name('shop.index');
+
+
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

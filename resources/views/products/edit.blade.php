@@ -88,30 +88,6 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="sku" class="form-label">SKU *</label>
-                            <input type="text" class="form-control @error('sku') is-invalid @enderror" 
-                                   id="sku" name="sku" value="{{ old('sku', $product->sku) }}" required>
-                            @error('sku')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="barcode" class="form-label">Code-barres</label>
-                            <input type="text" class="form-control @error('barcode') is-invalid @enderror" 
-                                   id="barcode" name="barcode" value="{{ old('barcode', $product->barcode) }}">
-                            @error('barcode')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
                             <label class="form-label">Statut *</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="status" 
