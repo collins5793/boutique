@@ -6,6 +6,9 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
+;
 
 
 
@@ -27,7 +30,8 @@ Route::get('categories/{category}/products', [CategoryController::class, 'produc
     ->name('categories.products');
 
 
-    
+
+
 
 // Routes pour les produits
 Route::resource('products', ProductController::class);
@@ -55,5 +59,24 @@ Route::middleware('auth')->group(function () {
 // ROLES
 Route::resource('roles', RoleController::class);
 
+
+
+//Commandes
+// routes/web.php
+
+Route::middleware(['auth'])->group(function() {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+});
+
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+// Liste des commandes
+Route::get('/mes-commandes', [OrderController::class, 'index'])->name('orders.index')->middleware('auth');
+
+// Détails d'une commande (fetch via JS)
+Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show')->middleware('auth');
 
 require __DIR__.'/auth.php';

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'in_transit', 'delivered'])->default('pending');
             $table->string('tracking_number', 100)->nullable();
             $table->timestamp('delivered_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('delivery_person_id')->references('id')->on('users')->onDelete('cascade');

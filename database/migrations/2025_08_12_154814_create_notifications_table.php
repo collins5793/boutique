@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('content');
             $table->enum('type', ['system', 'promo', 'order']);
             $table->timestamp('read_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

@@ -41,4 +41,10 @@ class Product extends Model
     {
         return $this->stock_quantity > 0;
     }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
 }
