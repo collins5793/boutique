@@ -8,7 +8,10 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-;
+use App\Http\Controllers\DeliveryAddressController;
+use App\Http\Controllers\DeliveryController;
+
+
 
 
 
@@ -78,5 +81,26 @@ Route::get('/mes-commandes', [OrderController::class, 'index'])->name('orders.in
 
 // Détails d'une commande (fetch via JS)
 Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show')->middleware('auth');
+
+
+Route::middleware('auth')->group(function() {
+    Route::post('/addresses/store', [DeliveryAddressController::class, 'store'])->name('addresses.store');
+    Route::get('/addresses/map', [DeliveryAddressController::class, 'map'])->name('address.map'); // page choix sur carte
+});
+
+
+
+
+
+
+Route::get('/delivery/pending', [DeliveryController::class, 'pendingOrders'])->name('delivery.pending');
+Route::post('/delivery/mark-delivered/{id}', [DeliveryController::class, 'markDelivered'])->name('delivery.markDelivered');
+Route::post('/delivery/start/{order}', [DeliveryController::class, 'startDelivery'])->name('delivery.start');
+Route::post('/delive/start/{order}', [DeliveryController::class, 'startDelive'])->name('delive.start');
+Route::post('/delivery/fin/{order}', [DeliveryController::class, 'finDelivery'])->name('delivery.fin');
+Route::post('/delivery/valide/{order}', [DeliveryController::class, 'valideDelivery'])->name('delivery.valide');
+Route::get('/delivery/tracking/{order}', [DeliveryController::class, 'tracking'])->name('delivery.tracking');
+Route::get('/delivery/tracki/{order}', [DeliveryController::class, 'tracking'])->name('delivery.tracki');
+
 
 require __DIR__.'/auth.php';
