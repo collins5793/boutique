@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-    //
+    protected $fillable = ['user_id', 'title', 'content', 'type', 'read_at'];
 }

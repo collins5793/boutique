@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('transaction_id', 100)->nullable();
             $table->enum('payment_status', ['pending', 'completed', 'failed'])->default('pending');
             $table->timestamp('paid_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });

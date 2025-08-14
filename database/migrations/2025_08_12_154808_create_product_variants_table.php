@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('attribute_value', 100);
             $table->decimal('price', 10, 2)->nullable();
             $table->integer('stock_quantity')->default(0);
+            $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
