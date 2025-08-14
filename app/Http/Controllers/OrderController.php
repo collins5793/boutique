@@ -38,6 +38,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'payment_method' => 'required|in:mobile_money,card,cash_on_delivery',
+            'delivery_address_id' => 'required|exists:delivery_addresses,id',
         ]);
 
         $userId = Auth::id();
@@ -51,13 +52,12 @@ class OrderController extends Controller
 
         try {
             // Calcul total
-            $totalAmount = $cartItems->sum(function ($item) {
-                return $item->price * $item->quantity;
-            });
+            $totalAmount = $cartItems->sum(fn($item) => $item->price * $item->quantity);
 
-            // Création de la commande
+            // Création de la commande avec l'adresse de livraison
             $order = Order::create([
                 'user_id' => $userId,
+                'delivery_address_id' => $request->delivery_address_id,
                 'order_number' => 'ORD-' . strtoupper(Str::random(8)),
                 'total_amount' => $totalAmount,
                 'payment_status' => 'pending',
@@ -65,7 +65,7 @@ class OrderController extends Controller
                 'payment_method' => $request->payment_method
             ]);
 
-            // Enregistrer chaque ligne
+            // Enregistrer chaque ligne de commande
             foreach ($cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -75,15 +75,19 @@ class OrderController extends Controller
                     'total' => $item->price * $item->quantity
                 ]);
 
-                // Déduire stock
+                // Déduire le stock
                 if ($item->variant_id) {
                     $variant = ProductVariant::find($item->variant_id);
-                    $variant->stock_quantity -= $item->quantity;
-                    $variant->save();
+                    if($variant){
+                        $variant->stock_quantity -= $item->quantity;
+                        $variant->save();
+                    }
                 } else {
                     $product = Product::find($item->product_id);
-                    $product->stock_quantity -= $item->quantity;
-                    $product->save();
+                    if($product){
+                        $product->stock_quantity -= $item->quantity;
+                        $product->save();
+                    }
                 }
             }
 
@@ -114,4 +118,5 @@ class OrderController extends Controller
             ]);
         }
     }
+
 }

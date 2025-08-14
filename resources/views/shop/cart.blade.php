@@ -54,9 +54,32 @@
         </div>
 
         <button id="clearCartBtn" class="btn btn-warning mt-3">Vider le panier</button>
-        <button id="checkoutBtn" class="btn btn-success">Passer la commande</button>
+        <button id="checkoutBtn" class="btn btn-success mt-3">Passer la commande</button>
 
-        <!-- Popup choix paiement -->
+        <!-- Popup choix adresse -->
+        <div id="addressChoicePopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+            <div style="background:#fff; padding:20px; border-radius:10px; max-width:400px; margin:10% auto;">
+                <h3>Choisissez votre adresse de livraison</h3>
+                <button class="addressOption btn btn-primary" data-type="current">Adresse actuelle</button>
+                <button class="addressOption btn btn-warning" data-type="manual">Saisie manuelle</button>
+                <button class="addressOption btn btn-success" data-type="map">Choisir sur la carte</button>
+                <br><br>
+                <button id="closeAddressPopup" class="btn btn-secondary">Annuler</button>
+            </div>
+        </div>
+
+        <!-- Popup saisie manuelle -->
+        <div id="manualAddressPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+            <div style="background:#fff; padding:20px; border-radius:10px; max-width:500px; margin:10% auto;">
+                <h4>Entrez votre adresse</h4>
+                <textarea id="manualAddress" class="form-control" rows="3" placeholder="Quartier, ville, repères..."></textarea>
+                <input type="text" id="manualLandmarks" class="form-control mt-2" placeholder="Repères supplémentaires (optionnel)">
+                <button id="submitManualAddress" class="btn btn-success mt-2">Valider l'adresse</button>
+                <button id="closeManualPopup" class="btn btn-secondary mt-2">Annuler</button>
+            </div>
+        </div>
+
+        {{-- validation commande --}}
         <div id="paymentChoicePopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
             <div style="background:#fff; padding:20px; border-radius:10px; max-width:400px; margin:10% auto;">
                 <h3>Choisissez votre mode de paiement</h3>
@@ -71,47 +94,116 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("✅ DOM chargé, initialisation des listeners...");
-
     const csrfToken = '{{ csrf_token() }}';
-
-    // Boutons du popup commande
+    
     const checkoutBtn = document.getElementById('checkoutBtn');
-    const popup = document.getElementById('paymentChoicePopup');
-    const closePopup = document.getElementById('closePopup');
+
+    const paymentPopup = document.getElementById('paymentChoicePopup');
+    const closePaymentPopup = document.getElementById('closePopup');
     const cashBtn = document.getElementById('cashOnDeliveryBtn');
     const onlineBtn = document.getElementById('onlinePaymentBtn');
 
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
-            console.log("🛒 Bouton 'Passer la commande' cliqué");
-            popup.style.display = 'block';
+    const addressPopup = document.getElementById('addressChoicePopup');
+    const manualPopup = document.getElementById('manualAddressPopup');
+
+    let selectedAddressId = null; // On stockera l'ID de l'adresse ici
+
+    // --- 1️⃣ Ouverture popup adresse ---
+    checkoutBtn.addEventListener('click', () => {
+        addressPopup.style.display = 'block';
+    });
+
+    // --- 2️⃣ Fermer popup adresse ---
+    document.getElementById('closeAddressPopup').addEventListener('click', () => {
+        addressPopup.style.display = 'none';
+    });
+
+    // --- 3️⃣ Choix option adresse ---
+    document.querySelectorAll('.addressOption').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+
+            if(type === 'current'){
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                const fullAddress = data.display_name;
+                                enregistrerAdresse({type:'current', full_address:fullAddress, latitude:lat, longitude:lng});
+                            })
+                            .catch(err => alert("Impossible de récupérer l'adresse: " + err));
+                    },
+                    err => alert("Impossible d'obtenir votre position: " + err.message)
+                );
+            } else if(type === 'manual'){
+                manualPopup.style.display = 'block';
+                addressPopup.style.display = 'none';
+            } else if(type === 'map'){
+                window.location.href = "{{ route('address.map') }}";
+            }
+        });
+    });
+
+    // --- 4️⃣ Saisie manuelle ---
+    document.getElementById('submitManualAddress').addEventListener('click', () => {
+        const address = document.getElementById('manualAddress').value;
+        const landmarks = document.getElementById('manualLandmarks').value;
+        if(!address) { alert("Veuillez saisir l'adresse"); return; }
+        enregistrerAdresse({type:'manual', full_address:address, landmarks:landmarks});
+    });
+
+    document.getElementById('closeManualPopup').addEventListener('click', () => {
+        manualPopup.style.display = 'none';
+    });
+
+    // --- 5️⃣ Enregistrer adresse ---
+    function enregistrerAdresse(data){
+        fetch("{{ route('addresses.store') }}", {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': csrfToken },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(resp => {
+            if(resp.success){
+                selectedAddressId = resp.delivery_addresses_id; // On récupère l'ID
+                addressPopup.style.display = 'none';
+                manualPopup.style.display = 'none';
+                paymentPopup.style.display = 'block'; // On ouvre le popup paiement
+            } else {
+                alert(resp.message || 'Erreur lors de l\'enregistrement de l\'adresse');
+            }
+        })
+        .catch(err => console.error(err));
+    }
+
+    // --- 6️⃣ Boutons paiement ---
+    if(closePaymentPopup){
+        closePaymentPopup.addEventListener('click', () => {
+            paymentPopup.style.display = 'none';
         });
     }
 
-    if (closePopup) {
-        closePopup.addEventListener('click', () => {
-            console.log("❌ Fermeture popup paiement");
-            popup.style.display = 'none';
-        });
-    }
+    [cashBtn, onlineBtn].forEach(btn => {
+        if(btn){
+            btn.addEventListener('click', () => {
+                const paymentMethod = btn.id === 'cashOnDeliveryBtn' ? 'cash_on_delivery' : 'mobile_money';
+                passerCommande(paymentMethod, selectedAddressId);
+            });
+        }
+    });
 
-    if (cashBtn) {
-        cashBtn.addEventListener('click', () => {
-            console.log("💵 Paiement à la livraison choisi");
-            passerCommande('cash_on_delivery');
-        });
-    }
+    // --- 7️⃣ Passer la commande avec l'adresse ---
+    function passerCommande(paymentMethod, addressId){
+        if(!addressId){
+            alert("Adresse non sélectionnée !");
+            return;
+        }
 
-    if (onlineBtn) {
-        onlineBtn.addEventListener('click', () => {
-            console.log("📱 Paiement mobile money choisi");
-            passerCommande('mobile_money');
-        });
-    }
-
-    function passerCommande(paymentMethod) {
-        console.log(`📤 Envoi de la commande (méthode: ${paymentMethod})`);
         fetch(`{{ route('orders.store') }}`, {
             method: 'POST',
             headers: {
@@ -119,97 +211,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ payment_method: paymentMethod })
+            body: JSON.stringify({ payment_method: paymentMethod, delivery_address_id: addressId })
         })
-        .then(res => {
-            console.log("📥 Réponse brute:", res.status, res.statusText);
-            return res.text();
-        })
-        .then(text => {
-            console.log("📦 Contenu brut:", text);
-            try {
-                const data = JSON.parse(text);
-                alert(data.message || 'Commande traitée');
-                if (data.success) {
-                    window.location.href = '/mes-commandes';
-                }
-            } catch (e) {
-                console.error("⚠️ Réponse non-JSON, peut-être une erreur Laravel:", e);
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message || 'Commande traitée');
+            if(data.success){
+                window.location.href = '/mes-commandes';
             }
         })
-        .catch(err => console.error("❌ Erreur fetch:", err));
-    }
-
-    // Boutons mise à jour panier
-    document.querySelectorAll(".updateBtn").forEach(btn => {
-        btn.addEventListener("click", function () {
-            let row = this.closest("tr");
-            let id = row.dataset.id;
-            let quantity = row.querySelector(".quantity-input").value;
-            console.log(`✏️ Mise à jour panier: ID=${id}, Qte=${quantity}`);
-
-            fetch(`/cart/update/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({ quantity })
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log("📥 Réponse update:", data);
-                alert(data.message);
-                location.reload();
-            })
-            .catch(err => console.error("❌ Erreur maj:", err));
-        });
-    });
-
-    // Boutons suppression produit
-    document.querySelectorAll(".removeBtn").forEach(btn => {
-        btn.addEventListener("click", function () {
-            if (!confirm("Supprimer ce produit du panier ?")) return;
-
-            let row = this.closest("tr");
-            let id = row.dataset.id;
-            console.log(`🗑 Suppression produit: ID=${id}`);
-
-            fetch(`/cart/remove/${id}`, {
-                method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': csrfToken }
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log("📥 Réponse suppression:", data);
-                alert(data.message);
-                row.remove();
-                location.reload();
-            })
-            .catch(err => console.error("❌ Erreur suppression:", err));
-        });
-    });
-
-    // Bouton vider panier
-    const clearBtn = document.getElementById("clearCartBtn");
-    if (clearBtn) {
-        clearBtn.addEventListener("click", function () {
-            if (!confirm("Vider tout le panier ?")) return;
-            console.log("🗑 Vider tout le panier");
-
-            fetch(`/cart/clear`, {
-                method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': csrfToken }
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log("📥 Réponse vider panier:", data);
-                alert(data.message);
-                location.reload();
-            })
-            .catch(err => console.error("❌ Erreur vider panier:", err));
-        });
+        .catch(err => console.error("Erreur fetch:", err));
     }
 });
 </script>
+
 @endsection

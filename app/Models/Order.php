@@ -16,6 +16,29 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function deliveryAddress()
+    {
+        return $this->belongsTo(DeliveryAddress::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function deliveries()
+    {
+        return $this->hasMany(Delivery::class);
+    }
+
+    // Si tu as besoin, tu peux aussi avoir une relation vers l'adresse
+    
+
 
 }
 
