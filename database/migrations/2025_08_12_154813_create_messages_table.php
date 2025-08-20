@@ -15,8 +15,10 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('sender_id');
             $table->unsignedBigInteger('receiver_id');
-            $table->text('message');
-            $table->enum('status', ['sent', 'read'])->default('sent');
+            $table->text('message')->nullable();
+            $table->string('file')->nullable();
+            $table->string('file_type')->nullable();
+            $table->enum('status', ['sent', 'read', 'deleted'])->default('sent');
             $table->timestamps();
 
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -10,8 +11,6 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DeliveryAddressController;
 use App\Http\Controllers\DeliveryController;
-
-
 
 
 
@@ -98,9 +97,26 @@ Route::post('/delivery/mark-delivered/{id}', [DeliveryController::class, 'markDe
 Route::post('/delivery/start/{order}', [DeliveryController::class, 'startDelivery'])->name('delivery.start');
 Route::post('/delive/start/{order}', [DeliveryController::class, 'startDelive'])->name('delive.start');
 Route::post('/delivery/fin/{order}', [DeliveryController::class, 'finDelivery'])->name('delivery.fin');
+Route::post('/delive/fin/{order}', [DeliveryController::class, 'finDelive'])->name('delive.fin');
 Route::post('/delivery/valide/{order}', [DeliveryController::class, 'valideDelivery'])->name('delivery.valide');
 Route::get('/delivery/tracking/{order}', [DeliveryController::class, 'tracking'])->name('delivery.tracking');
-Route::get('/delivery/tracki/{order}', [DeliveryController::class, 'tracking'])->name('delivery.tracki');
+Route::get('/delivery/tracki/{order}', [DeliveryController::class, 'tracki'])->name('delivery.tracki');
+
+
+Route::prefix('messages')->middleware('auth')->group(function () {
+    Route::get('/{receiver_id}', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/{receiver_id}', [MessageController::class, 'store'])->name('messages.store');
+    Route::put('/{message}', [MessageController::class, 'update'])->name('messages.update');
+    Route::delete('/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
+    Route::post('/read/{message}', [MessageController::class, 'markAsRead'])->name('messages.read');
+    Route::get('/fetch/{receiver}', [MessageController::class, 'fetch'])->name('messages.fetch');
+    Route::get('/{receiver}/fetch', [MessageController::class, 'fetch'])->name('messages.fetch');
+    Route::post('/{receiver}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+});
+Route::prefix('admin/messages')->middleware('auth')->group(function () {
+    Route::get('/', [MessageController::class, 'inbox'])->name('admin.messages.inbox');
+    Route::get('/conversation/{client}', [MessageController::class, 'conversation'])->name('admin.messages.conversation');
+});
 
 
 require __DIR__.'/auth.php';

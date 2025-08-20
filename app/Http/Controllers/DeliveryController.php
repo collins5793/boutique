@@ -50,9 +50,9 @@ class DeliveryController extends Controller
         //     $order->payment_status = 'paid';
         // }
 
-        // Mise à jour du statut de la commande
-        $order->order_status = 'processing';
-        $order->save();
+        // // Mise à jour du statut de la commande
+        // $order->order_status = 'processing';
+        // $order->save();
 
         // Créer la livraison
         $delivery = Delivery::create([
@@ -149,17 +149,55 @@ class DeliveryController extends Controller
         return redirect()->route('delivery.tracking', $order->id)
                         ->with('success', 'Livraison finalisée avec succès !');
     }
+    public function FinDelive(Order $order)
+    {
+        // Vérifier le paiement : si toujours pending → on le marque payé
+        if ($order->payment_status === 'pending') {
+            $order->payment_status = 'paid';
+        }
+
+        // Mettre à jour le statut de la commande
+        $order->order_status = 'shipped';
+        $order->save();
+
+        // Mettre à jour la livraison existante ou créer si elle n'existe pas
+        $delivery = $order->deliveries()->first();
+        if (!$delivery) {
+            $delivery = $order->deliveries()->create([
+                'delivery_person_id' => Auth::id(), // livreur connecté
+                'status' => 'delivered',
+                'delivered_at' => now(),
+            ]);
+        } else {
+            $delivery->status = 'delivered';
+            $delivery->delivered_at = now();
+            $delivery->save();
+        }
+
+        // Envoyer une notification au client pour validation
+        \App\Models\Notification::create([
+            'user_id' => $order->user_id,
+            'title' => "Commande livrée ✅",
+            'content' => "Votre commande {$order->order_number} a été livrée. Veuillez confirmer la réception.",
+            'type' => 'system'
+        ]);
+
+        return redirect()->route('delivery.tracki', $order->id)
+                        ->with('success', 'Livraison finalisée avec succès !');
+    }
 
 
 // Confirmation par le client
     
 
-    public function valideDelivery(Order $order)
+public function valideDelivery(Order $order)
 {
-    // Vérification que la livraison a bien une commande
-    
+    // Vérifier si la commande a bien le statut "shipped"
+    if ($order->order_status !== 'shipped') {
+        return redirect()->back()->with('error', "Cette commande n'est pas encore validée par le livreur. ⏳");
+    }
 
-    // Mise à jour du statut de la commande
+    // Mettre à jour le statut de la commande en "delivered"
     $order->order_status = 'delivered';
     $order->save();
 
@@ -173,6 +211,7 @@ class DeliveryController extends Controller
 
     return redirect()->back()->with('success', 'Livraison confirmée avec succès !');
 }
+
 
     // Confirmation par le client
    
@@ -188,6 +227,14 @@ class DeliveryController extends Controller
         }
 
         return view('delivery.tracking', compact('order'));
+}
+
+    public function tracki(Order $order)
+    {
+        // Charger toutes les infos utiles avec les relations
+        $order->load(['deliveryAddress', 'user']);
+
+        return view('delivery.tracki', compact('order'));
 }
 
 
