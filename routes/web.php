@@ -10,6 +10,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DeliveryAddressController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\ChatbotResponseController;
 
 
 
@@ -32,7 +33,9 @@ Route::resource('categories', CategoryController::class);
 Route::get('categories/{category}/products', [CategoryController::class, 'productsByCategory'])
     ->name('categories.products');
 
-
+// Routes pour le chatbot
+Route::post('/chatbot/send', [ChatbotResponseController::class, 'sendMessage'])->name('chatbot.send');
+Route::get('/chatbot', [ChatbotResponseController::class, 'index'])->name('chatbot.index');
 
 
 
