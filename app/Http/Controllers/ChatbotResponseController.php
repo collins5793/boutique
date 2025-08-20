@@ -2,64 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChatbotResponse;
+use App\Services\ChatbotService;
 use Illuminate\Http\Request;
 
 class ChatbotResponseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $chatbotService;
+    
+    public function __construct(ChatbotService $chatbotService)
+    {
+        $this->chatbotService = $chatbotService;
+    }
+    
     public function index()
     {
-        //
+        return view('chatbot.index');
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    
+    public function sendMessage(Request $request)
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(ChatbotResponse $chatbotResponse)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ChatbotResponse $chatbotResponse)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ChatbotResponse $chatbotResponse)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ChatbotResponse $chatbotResponse)
-    {
-        //
+        $request->validate([
+            'message' => 'required|string'
+        ]);
+        
+        $response = $this->chatbotService->processMessage($request->input('message'));
+        
+        return response()->json([
+            'response' => $response
+        ]);
     }
 }
