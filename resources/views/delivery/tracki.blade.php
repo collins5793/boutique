@@ -10,7 +10,7 @@
     <p><strong>Adresse :</strong> {{ $order->deliveryAddress->full_address ?? 'Adresse non précisée' }}</p>
 </div>
 
-<form action="{{ route('delivery.fin', $order->id) }}" method="POST">
+<form action="{{ route('delive.fin', $order->id) }}" method="POST">
         @csrf
         <button type="submit" class="btn btn-success">🚚 Livrer cette commande</button>
 </form>

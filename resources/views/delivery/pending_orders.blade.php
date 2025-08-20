@@ -50,14 +50,14 @@
 
                             <div class="mt-2 d-flex gap-2">
                                 <button class="btn btn-success start-delive-btn" data-order-id="{{ $order->id }}">
-    Livrer
-</button>
+                                    Livrer
+                                </button>
 
                                 @if($canRoute)
 
-                                 <button class="btn btn-success start-delivery-btn" data-order-id="{{ $order->id }}">
-    Livrer
-</button>
+                                <button class="btn btn-success start-delivery-btn" data-order-id="{{ $order->id }}">
+                                    Livrer
+                                </button>
 
                                     <button class="btn btn-primary view-route-btn"
                                             data-lat="{{ $addr->latitude }}"

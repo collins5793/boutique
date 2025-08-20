@@ -56,4 +56,16 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+    public function messages()
+{
+    // Un utilisateur peut envoyer plusieurs messages
+    return $this->hasMany(Message::class, 'sender_id');
+}
+
+public function receivedMessages()
+{
+    // Un utilisateur peut recevoir plusieurs messages
+    return $this->hasMany(Message::class, 'receiver_id');
+}
 }
