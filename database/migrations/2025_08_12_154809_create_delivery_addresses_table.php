@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('delivery_addresses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('order_id')->nullable(); // nullable
             $table->enum('address_type', ['current', 'manual', 'map']);
             $table->text('full_address');
             $table->decimal('latitude', 10, 7)->nullable();
@@ -22,6 +23,8 @@ return new class extends Migration
             $table->boolean('is_default')->default(false);
             $table->timestamps();
         });
+
+    
     }
 
     /**

@@ -1,4 +1,4 @@
-@extends('layouts.apli')
+@extends('layouts.livreurs.livreur')
 
 @section('content')
 <h1>🚚 Livraison en cours</h1>
