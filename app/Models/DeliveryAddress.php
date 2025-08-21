@@ -11,7 +11,7 @@ class DeliveryAddress extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'address_type', 'full_address',
+        'user_id','order_id', 'address_type', 'full_address',
         'latitude', 'longitude', 'landmarks', 'is_default'
     ];
 
