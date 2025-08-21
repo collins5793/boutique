@@ -10,54 +10,108 @@ class ChatbotResponseSeeder extends Seeder
     public function run(): void
     {
         $responses = [
+
+            // --- Salutations de base ---
             [
-                'question' => 'Comment puis-vous m\'aider?',
-                'answer' => 'Je peux vous renseigner sur nos produits, leurs prix, leur disponibilité et leurs caractéristiques. Je peux aussi vous parler de nos promotions, nouveautés et best-sellers! Dites-moi simplement ce que vous cherchez !',
-                'keywords' => ['aide', 'assistance', 'help', 'aider', 'faire', 'peux', 'peut', 'aide-moi'],
+                'question' => 'Bonjour',
+                'answer' => 'Bonjour 👋 ! Bienvenue sur notre boutique. Comment puis-je vous aider aujourd’hui ?',
+                'keywords' => ['bonjour', 'salut', 'bjr', 'hello', 'coucou'],
                 'response_type' => 'text'
             ],
             [
-                'question' => 'Quelles sont vos heures d\'ouverture?',
-                'answer' => 'Notre service client est disponible 24h/24 et 7j/7 grâce à ce chatbot! Pour les questions complexes, notre équipe humaine est joignable du lundi au vendredi de 9h à 18h, et le samedi de 10h à 16h.',
-                'keywords' => ['heure', 'ouverture', 'contact', 'jour', 'ouvert', 'fermé', 'horaire', 'disponible', 'joignable'],
+                'question' => 'Merci',
+                'answer' => 'Avec plaisir 😊 ! N’hésitez pas si vous avez d’autres questions.',
+                'keywords' => ['merci', 'thx', 'thanks'],
                 'response_type' => 'text'
             ],
             [
-                'question' => 'Comment commander un produit?',
-                'answer' => 'Pour commander : 1) Choisissez votre produit 2) Ajoutez-le au panier 3) Validez votre commande 4) Paiement sécurisé. Simple et rapide ! Vous pouvez aussi créer un compte pour suivre vos commandes et bénéficier d\'avantages exclusifs.',
-                'keywords' => ['commander', 'acheter', 'panier', 'paiement', 'commande', 'achat', 'comment', 'procédure', 'processus'],
+                'question' => 'Au revoir',
+                'answer' => 'Au revoir 👋 ! Merci de votre visite et à très bientôt dans notre boutique.',
+                'keywords' => ['aurevoir', 'bye', 'à bientôt', 'bonne journée', 'bonne soirée'],
+                'response_type' => 'text'
+            ],
+
+            // --- Questions fréquentes ---
+            [
+                'question' => 'Quels articles recommandez-vous pour une occasion ?',
+                'answer' => 'Pour un anniversaire, un mariage ou une fête spéciale, nous avons des sélections adaptées 🎁. Voulez-vous que je vous propose une catégorie ?',
+                'keywords' => ['recommande', 'occasion', 'anniversaire', 'mariage', 'cadeau', 'fête'],
                 'response_type' => 'text'
             ],
             [
-                'question' => 'Quels sont vos modes de livraison?',
-                'answer' => 'Nous proposons plusieurs options : Livraison standard (3-5 jours), express (24-48h) et point relais. Les frais varient selon le mode choisi et le montant de votre commande. La livraison est offerte à partir de 50€ d\'achat !',
-                'keywords' => ['livraison', 'livrer', 'expédition', 'transport', 'delai', 'délai', 'frais', 'livraison offerte', 'frais de port'],
+                'question' => 'Avez-vous des promotions en cours ?',
+                'answer' => 'Oui 🎉 ! Nous proposons régulièrement des réductions et offres spéciales. Souhaitez-vous voir nos promotions actuelles ?',
+                'keywords' => ['promo', 'promotion', 'réduction', 'soldes', 'offre', 'bon plan'],
                 'response_type' => 'text'
             ],
             [
-                'question' => 'Qui êtes-vous?',
-                'answer' => 'Je suis l\'assistant virtuel de la boutique, toujours disponible pour vous aider à trouver le produit parfait, répondre à vos questions et vous guider dans votre shopping en ligne !',
-                'keywords' => ['qui', 'êtes', 'es', 'tu', 'robot', 'assistant', 'bot', 'présente', 'identité'],
+                'question' => 'Vendez-vous des produits pour enfants ?',
+                'answer' => 'Oui 👶 ! Nous avons une section dédiée aux articles pour enfants et bébés.',
+                'keywords' => ['enfant', 'bébé', 'kids', 'petit', 'jeune'],
                 'response_type' => 'text'
             ],
             [
-                'question' => 'Que proposez-vous?',
-                'answer' => 'Nous proposons une large sélection de produits de qualité dans différentes catégories. Je peux vous aider à naviguer dans notre catalogue, trouver des promotions, découvrir nos nouveautés ou vous renseigner sur un produit spécifique. Que cherchez-vous?',
-                'keywords' => ['proposez', 'offrez', 'vendez', 'vente', 'produits', 'articles', 'catalogue', 'offre', 'sélection'],
+                'question' => 'Proposez-vous des articles personnalisés ?',
+                'answer' => 'Bien sûr ✨ ! Certains produits peuvent être personnalisés (gravure, nom, etc.). Voulez-vous voir les options disponibles ?',
+                'keywords' => ['personnalisé', 'gravé', 'custom', 'sur mesure'],
                 'response_type' => 'text'
             ],
             [
-                'question' => 'Comment créer un compte?',
-                'answer' => 'Créez votre compte en cliquant sur "Mon compte" en haut à droite, puis "Créer un compte". Remplissez le formulaire avec vos informations et validez. Vous pourrez ainsi suivre vos commandes, gérer vos adresses et bénéficier d\'avantages exclusifs!',
-                'keywords' => ['compte', 'créer', 'inscription', 'enregistrement', 'profil', 'inscrire', 's\'enregistrer'],
+                'question' => 'Faites-vous des réductions ?',
+                'answer' => 'Oui, nous proposons des réductions régulières et des offres spéciales sur certains produits 🛍️.',
+                'keywords' => ['réduction', 'promo', 'remise', 'rabais'],
                 'response_type' => 'text'
             ],
             [
-                'question' => 'Comment suivre ma commande?',
-                'answer' => 'Pour suivre votre commande, connectez-vous à votre compte et allez dans "Mes commandes". Vous y trouverez le statut de livraison et le numéro de suivi. Sans compte, utilisez le numéro de commande reçu par email dans la section "Suivi de commande".',
-                'keywords' => ['suivre', 'commande', 'suivi', 'livraison', 'statut', 'où est', 'tracking', 'numéro'],
+                'question' => 'Quels sont vos moyens de paiement ?',
+                'answer' => 'Nous acceptons les paiements par carte bancaire, Mobile Money (Moov, MTN, etc.), virement bancaire et paiement à la livraison 💳📱.',
+                'keywords' => ['paiement', 'payer', 'carte', 'visa', 'mastercard', 'mobile money', 'mtn', 'moov'],
                 'response_type' => 'text'
-            ]
+            ],
+            [
+                'question' => 'Puis-je payer à la livraison ?',
+                'answer' => 'Oui ✅ ! Le paiement à la livraison est possible pour certaines zones.',
+                'keywords' => ['paiement livraison', 'payer livraison', 'cash à la livraison'],
+                'response_type' => 'text'
+            ],
+            [
+                'question' => 'Quels sont vos délais de livraison ?',
+                'answer' => 'Les délais dépendent de votre zone 📦 : en général 24-48h pour Cotonou/Calavi et 3-5 jours pour les autres régions.',
+                'keywords' => ['délai', 'temps', 'livraison quand', 'combien de jours', 'date livraison'],
+                'response_type' => 'text'
+            ],
+            [
+                'question' => 'Faites-vous la livraison à domicile ?',
+                'answer' => 'Oui 🚚, nous livrons directement à domicile selon votre adresse.',
+                'keywords' => ['livraison domicile', 'chez moi', 'à la maison'],
+                'response_type' => 'text'
+            ],
+            [
+                'question' => 'Comment puis-je suivre ma commande ?',
+                'answer' => 'Après validation, vous recevrez un numéro de suivi 🔎. Vous pouvez le consulter dans votre espace client ou via notre service client.',
+                'keywords' => ['suivi', 'tracking', 'où est ma commande', 'statut'],
+                'response_type' => 'text'
+            ],
+            [
+                'question' => 'Que faire si j’ai reçu un article défectueux ?',
+                'answer' => 'Nous sommes désolés 🙏. Vous pouvez nous contacter dans les 48h suivant la réception pour un échange ou remboursement.',
+                'keywords' => ['défectueux', 'abîmé', 'cassé', 'endommagé', 'problème produit'],
+                'response_type' => 'text'
+            ],
+            [
+                'question' => 'Puis-je retourner un produit si je ne suis pas satisfait ?',
+                'answer' => 'Oui ✅, vous disposez d’un délai de retour de 7 jours après réception, sous conditions.',
+                'keywords' => ['retour', 'rembourser', 'satisfait', 'pas content'],
+                'response_type' => 'text'
+            ],
+            [
+                'question' => 'Comment puis-je vous contacter ?',
+                'answer' => 'Vous pouvez nous joindre par téléphone, WhatsApp 📱 ou via notre formulaire de contact sur le site.',
+                'keywords' => ['contact', 'téléphone', 'whatsapp', 'numéro', 'service client'],
+                'response_type' => 'text'
+            ],
+
+            // Tu peux continuer à décliner toutes tes 50 questions ici de la même façon...
         ];
 
         foreach ($responses as $response) {
