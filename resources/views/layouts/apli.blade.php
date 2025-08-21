@@ -14,7 +14,7 @@
             word-wrap: break-word;
         }
         .chatbot-user-message {
-            background-color: #0d6efd;
+            background-color: #fd0ddd;
             color: white;
             border-radius: 18px 18px 5px 18px;
         }

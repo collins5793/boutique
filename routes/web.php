@@ -12,6 +12,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DeliveryAddressController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ChatbotResponseController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
 
 
@@ -21,6 +22,7 @@ Route::get('/', function () {
 });
 
 
+Route::get('/accueil', [HomeController::class, 'index'])->name('home');
 
 
 
