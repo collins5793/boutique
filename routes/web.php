@@ -12,6 +12,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DeliveryAddressController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ChatbotResponseController;
+use App\Http\Controllers\NotificationController;
 
 
 
@@ -48,8 +49,12 @@ Route::get('/shop', [ProductController::class, 'getActiveProductsByCategory'])->
 
 
 
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('client/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -120,6 +125,14 @@ Route::prefix('admin/messages')->middleware('auth')->group(function () {
     Route::get('/', [MessageController::class, 'inbox'])->name('admin.messages.inbox');
     Route::get('/conversation/{client}', [MessageController::class, 'conversation'])->name('admin.messages.conversation');
 });
+
+
+
+
+
+
+// routes/web.php
+Route::resource('notifications', NotificationController::class);
 
 
 require __DIR__.'/auth.php';
