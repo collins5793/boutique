@@ -3,13 +3,13 @@
         <div class="logo">L</div>
         <div class="logo-text">Livraison</div>
     </div>
-    
+
     <div class="menu-container">
         <div class="menu-section">
             <div class="section-label">livreur</div>
             <ul class="menu">
                 <li class="menu-item active">
-                    <a href="#" class="menu-link">
+                    <a href="{{ route('delivery.dashboard') }}" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-home"></i></div>
                         <div class="menu-text">Dashboard</div>
                         <div class="tooltip">Dashboard</div>
@@ -24,10 +24,10 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div class="menu-icon"><i class="fas fa-box"></i></div>
-                        <div class="menu-text">Produits</div>
-                        <div class="tooltip">Produits</div>
+                    <a href="{{ route('delivery.delivered-orders') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <div class="menu-text">Mes Livraisons</div>
+                        <div class="tooltip">Mes Livraisons Effectuées</div>
                     </a>
                 </li>
                 <li class="menu-item">
@@ -39,7 +39,7 @@
                 </li>
             </ul>
         </div>
-        
+
         <div class="menu-section">
             <div class="section-label">Préférences</div>
             <ul class="menu">
@@ -62,7 +62,7 @@
     </div>
 </div>
 
-<!-- Mobile overlay -->
+<!-- Overlay pour mobile -->
 <div class="mobile-overlay" id="mobileOverlay"></div>
 
 <style>
@@ -73,10 +73,10 @@
         --dark: #1e293b;
         --dark-light: #334155;
         --sidebar-width: 280px;
-        --sidebar-collapsed: 80px;
+        --sidebar-collapsed: 90px;
         --header-height: 80px;
         --radius: 12px;
-        --transition: all 0.3s ease;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
 
@@ -97,6 +97,7 @@
         overflow-x: hidden;
     }
 
+    /* Réduit = icônes seulement (desktop et mobile par défaut) */
     .sidebar.collapsed {
         width: var(--sidebar-collapsed);
     }
@@ -120,7 +121,8 @@
         justify-content: center;
         font-weight: bold;
         font-size: 18px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        flex-shrink: 0;
     }
 
     .logo-text {
@@ -129,27 +131,14 @@
         margin-left: 12px;
         color: white;
         white-space: nowrap;
-        transition: var(--transition);
+        transition: opacity .2s ease;
         background: linear-gradient(to right, #fff, #e2e8f0);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    .sidebar.collapsed .logo-text {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .menu-container {
-        flex: 1;
-        padding: 16px 0;
-        margin-top: 10px;
-    }
-
-    .menu-section {
-        padding: 0 16px;
-        margin-bottom: 24px;
-    }
+    .menu-container { flex: 1; padding: 16px 0; margin-top: 10px; }
+    .menu-section { padding: 0 16px; margin-bottom: 24px; }
 
     .section-label {
         font-size: 0.75rem;
@@ -158,234 +147,86 @@
         color: #94a3b8;
         margin-bottom: 12px;
         padding: 0 16px;
-        transition: var(--transition);
         white-space: nowrap;
+        transition: opacity .2s ease;
     }
 
-    .sidebar.collapsed .section-label {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .menu-item {
-        margin: 6px 8px;
-        border-radius: var(--radius);
-        position: relative;
-        overflow: hidden;
-    }
-
+    .menu { list-style: none; padding: 0; margin: 0; }
+    .menu-item { margin: 6px 8px; border-radius: var(--radius); position: relative; overflow: hidden; }
     .menu-link {
         padding: 14px 16px;
         display: flex;
         align-items: center;
         cursor: pointer;
-        transition: var(--transition);
+        transition: background .2s ease;
         text-decoration: none;
         color: inherit;
         position: relative;
     }
-
-    .menu-item::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: var(--primary);
-        opacity: 0;
-        transition: var(--transition);
-    }
-
-    .menu-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .menu-item:hover::before {
-        opacity: 1;
-    }
+    .menu-item:hover { background: rgba(255,255,255,0.05); }
 
     .menu-item.active {
-        background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(139, 92, 246, 0.1));
-        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+        background: linear-gradient(135deg, rgba(124,58,237,.2), rgba(139,92,246,.1));
+        box-shadow: 0 4px 12px rgba(124,58,237,.15);
     }
 
-    .menu-item.active::before {
-        opacity: 1;
-    }
+    .menu-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; }
+    .menu-text { margin-left: 16px; white-space: nowrap; font-weight: 500; font-size: 0.95rem; color: #e2e8f0; transition: opacity .2s ease; }
+    .badge { margin-left: auto; background: var(--primary); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; transition: opacity .2s ease; }
 
-    .menu-item.active .menu-icon {
-        color: var(--primary-light);
-        transform: scale(1.1);
-    }
-
-    .menu-icon {
-        width: 22px;
-        height: 22px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: var(--transition);
-        color: #cbd5e1;
-    }
-
-    .menu-text {
-        margin-left: 16px;
-        white-space: nowrap;
-        transition: var(--transition);
-        font-weight: 500;
-        font-size: 0.95rem;
-        color: #e2e8f0;
-    }
-
-    .sidebar.collapsed .menu-text {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .badge {
-        margin-left: auto;
-        background: var(--primary);
-        color: white;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        transition: var(--transition);
-    }
-
+    /* Cacher les textes en mode "collapsed" (icônes seulement) */
+    .sidebar.collapsed .logo-text,
+    .sidebar.collapsed .menu-text,
+    .sidebar.collapsed .section-label,
     .sidebar.collapsed .badge {
         opacity: 0;
         visibility: hidden;
     }
 
-    /* Tooltip for collapsed state */
+    /* Tooltip quand collapsed (desktop) */
     .menu-item .tooltip {
         position: absolute;
         left: 90px;
         background: var(--dark);
-        padding: 8px 16px;
+        padding: 8px 12px;
         border-radius: 6px;
         font-size: 0.85rem;
         opacity: 0;
         visibility: hidden;
-        transition: var(--transition);
+        transition: opacity .2s ease;
         z-index: 1000;
         white-space: nowrap;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         pointer-events: none;
         color: white;
     }
+    .sidebar.collapsed .menu-item:hover .tooltip { opacity: 1; visibility: visible; }
 
-    .sidebar.collapsed .menu-item:hover .tooltip {
-        opacity: 1;
-        visibility: visible;
-    }
+    /* --- Mobile --- */
+    @media (max-width:1024px) {
+        /* Par défaut sur mobile : sidebar réduit (icônes seulement) */
+        .sidebar { width: var(--sidebar-collapsed); }
 
-    /* Mobile responsiveness */
-    @media (max-width: 1024px) {
-        .sidebar {
-            width: var(--sidebar-collapsed);
-            transform: translateX(-100%);
-        }
-        
+        /* Ouvert en slide-in (largeur complète) */
         .sidebar.mobile-open {
-            transform: translateX(0);
             width: var(--sidebar-width);
         }
-        
-        .sidebar .logo-text,
-        .sidebar .menu-text,
-        .sidebar .section-label,
-        .sidebar .badge {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .sidebar.mobile-open .logo-text,
-        .sidebar.mobile-open .menu-text,
-        .sidebar.mobile-open .section-label,
-        .sidebar.mobile-open .badge {
-            opacity: 1;
-            visibility: visible;
-        }
-        
+
+        /* Overlay */
         .mobile-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: rgba(0,0,0,0.45);
             z-index: 999;
             opacity: 0;
             visibility: hidden;
-            transition: var(--transition);
+            transition: opacity .25s ease, visibility .25s ease;
         }
-        
-        .mobile-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .mobile-overlay.active { opacity: 1; visibility: visible; }
     }
 
-    /* Scrollbar styling */
-    .sidebar::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .sidebar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .sidebar::-webkit-scrollbar-thumb {
-        background: var(--primary);
-        border-radius: 4px;
-    }
+    /* Scrollbar */
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-        
-        // Handle menu item clicks
-        const menuItems = document.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // Remove active class from all items
-                menuItems.forEach(i => i.classList.remove('active'));
-                // Add active class to clicked item
-                this.classList.add('active');
-                
-                // On mobile, close sidebar after selection
-                if (window.innerWidth < 1024) {
-                    sidebar.classList.remove('mobile-open');
-                    mobileOverlay.classList.remove('active');
-                }
-            });
-        });
-        
-        if (mobileOverlay) {
-            mobileOverlay.addEventListener('click', function() {
-                sidebar.classList.remove('mobile-open');
-                mobileOverlay.classList.remove('active');
-            });
-        }
-        
-        // Window resize handler
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 1024) {
-                sidebar.classList.remove('mobile-open');
-                mobileOverlay.classList.remove('active');
-            }
-        });
-    });
-</script>
