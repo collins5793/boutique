@@ -246,4 +246,72 @@ public function valideDelivery(Order $order)
         return view('delivery.tracking', compact('order'));
     }
 
+public function deliveredOrders()
+{
+    $deliveries = Delivery::with([
+        'order.user:id,name',
+        'order.orderItems.product:id,name',
+        'order.deliveryAddress:id,order_id,full_address'
+    ])
+    ->where('delivery_person_id', Auth::id())
+    ->where('status', 'delivered')
+    ->orderBy('delivered_at', 'desc')
+    ->paginate(10);
+
+    return view('delivery.delivered_orders', compact('deliveries'));
+}
+
+// Dashboard du livreur
+public function dashboard()
+{
+    $user = Auth::user();
+    $today = now()->format('Y-m-d');
+    
+    // Statistiques
+    $stats = [
+        'today_deliveries' => Delivery::where('delivery_person_id', $user->id)
+            ->whereDate('created_at', $today)
+            ->count(),
+            
+        'weekly_deliveries' => Delivery::where('delivery_person_id', $user->id)
+            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->count(),
+            
+        'pending_deliveries' => Delivery::where('delivery_person_id', $user->id)
+            ->where('status', 'in_transit')
+            ->count(),
+            
+        'completed_deliveries' => Delivery::where('delivery_person_id', $user->id)
+            ->where('status', 'delivered')
+            ->count(),
+    ];
+    
+    // Commandes du jour
+    $today_orders = Delivery::with(['order.user', 'order.deliveryAddress'])
+        ->where('delivery_person_id', $user->id)
+        ->whereDate('created_at', $today)
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+    
+    // Prochaines livraisons
+    $upcoming_deliveries = Order::with(['user', 'deliveryAddress'])
+        ->where('order_status', 'pending')
+        ->whereDoesntHave('deliveries')
+        ->orderBy('created_at', 'asc')
+        ->take(5)
+        ->get();
+    
+    // Performances
+    $performance = [
+        'success_rate' => $stats['completed_deliveries'] > 0 ? 
+            round(($stats['completed_deliveries'] / ($stats['completed_deliveries'] + $stats['pending_deliveries'])) * 100, 2) : 0,
+        
+        'average_time' => '35 min', // À calculer based on real data
+        'rating' => 4.8 // À récupérer from ratings table
+    ];
+    
+    return view('delivery.dashboard', compact('stats', 'today_orders', 'upcoming_deliveries', 'performance'));
+}
+
 }

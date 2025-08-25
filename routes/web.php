@@ -123,6 +123,10 @@ Route::post('/delive/fin/{order}', [DeliveryController::class, 'finDelive'])->na
 Route::post('/delivery/valide/{order}', [DeliveryController::class, 'valideDelivery'])->name('delivery.valide');
 Route::get('/delivery/tracking/{order}', [DeliveryController::class, 'tracking'])->name('delivery.tracking');
 Route::get('/delivery/tracki/{order}', [DeliveryController::class, 'tracki'])->name('delivery.tracki');
+Route::get('/delivery/delivered-orders', [DeliveryController::class, 'deliveredOrders'])
+    ->name('delivery.delivered-orders');
+Route::get('/delivery/dashboard', [DeliveryController::class, 'dashboard'])
+    ->name('delivery.dashboard');
 
 
 Route::prefix('messages')->middleware('auth')->group(function () {
