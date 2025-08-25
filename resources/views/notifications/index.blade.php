@@ -417,58 +417,7 @@
                         }
                     });
                 });
-            });
-            
-            // Marquer toutes les notifications comme lues
-            const markAllReadBtn = document.querySelector('.btn-primary');
-            if (markAllReadBtn) {
-                markAllReadBtn.addEventListener('click', function() {
-                    document.querySelectorAll('.notification-item.unread').forEach(item => {
-                        item.classList.remove('unread');
-                        const badge = item.querySelector('.notification-badge');
-                        if (badge) {
-                            badge.remove();
-                        }
-                    });
-                    
-                    // Afficher une confirmation
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check"></i> Marqué comme lu';
-                    
-                    setTimeout(() => {
-                        this.innerHTML = originalText;
-                    }, 2000);
-                });
-            }
-            
-            // Supprimer une notification
-            const deleteButtons = document.querySelectorAll('.action-btn');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const notification = this.closest('.notification-item');
-                    notification.style.opacity = '0';
-                    notification.style.transform = 'translateX(100px)';
-                    
-                    setTimeout(() => {
-                        notification.remove();
-                        
-                        // Si plus de notifications, afficher l'état vide
-                        if (document.querySelectorAll('.notification-item').length === 0) {
-                            const emptyState = document.createElement('div');
-                            emptyState.className = 'empty-state';
-                            emptyState.innerHTML = `
-                                <i class="far fa-bell-slash"></i>
-                                <h3>Aucune notification</h3>
-                                <p>Vous n'avez aucune notification pour le moment.</p>
-                            `;
-                            document.querySelector('.notification-list').appendChild(emptyState);
-                        }
-                    }, 300);
-                });
-            });
+            });            
         });
     </script>
 

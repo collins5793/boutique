@@ -17,11 +17,14 @@
             --dark-light: #334155;
             --light: #ffffff;
             --sidebar-width: 280px;
-            --sidebar-collapsed: 90px;
+            --sidebar-collapsed: 85px;
             --header-height: 80px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --radius: 12px;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --mobile-breakpoint: 1024px;
+            --tablet-breakpoint: 768px;
+            --phone-breakpoint: 576px;
         }
 
         * {
@@ -34,6 +37,7 @@
             background-color: #fff4f4;
             font-family: Arial, sans-serif;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         
         /* Container principal */
@@ -41,6 +45,7 @@
             display: flex;
             width: 100%;
             min-height: 100vh;
+            position: relative;
         }
         
         /* Contenu principal */
@@ -51,6 +56,7 @@
             margin-left: var(--sidebar-width);
             transition: var(--transition);
             min-height: 100vh;
+            position: relative;
         }
         
         .main-content.expanded {
@@ -62,6 +68,7 @@
             padding: 20px;
             flex: 1;
             margin-top: var(--header-height);
+            transition: var(--transition);
         }
         
         /* Section Hero avec image de fond */
@@ -146,24 +153,61 @@
         }
         
         /* Responsive */
-        @media (max-width: 768px) {
-            .dashboard-container {
-                flex-direction: column;
-            }
-            
+        @media (max-width: 1024px) {
             .main-content {
-                margin-left: 0 !important;
+                margin-left: var(--sidebar-collapsed) !important;
             }
             
             .hero-section {
-                padding: 40px 20px;
+                padding: 40px 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-content {
+                padding: 15px;
+            }
+            
+            .hero-section {
+                padding: 30px 20px;
+                margin-bottom: 20px;
             }
             
             .hero-content h1 {
                 font-size: 2rem;
             }
+            
+            .hero-content p {
+                font-size: 1rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-content {
+                padding: 10px;
+            }
+            
+            .hero-section {
+                padding: 20px 15px;
+                border-radius: 8px;
+            }
+            
+            .hero-content h1 {
+                font-size: 1.75rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
         }
     </style>
+    @yield('styles')
 </head>
 <body>
     <div class="dashboard-container">
@@ -181,7 +225,7 @@
             </div>
         </div>
     </div>
-
+@yield('scripts')
     <script>
         // Script pour gérer la communication entre les composants
         document.addEventListener('DOMContentLoaded', function() {
@@ -189,20 +233,29 @@
             const mainContent = document.getElementById('mainContent');
             const header = document.querySelector('.header');
             const toggleBtn = document.getElementById('toggleSidebar');
+            const mobileMenuBtn = document.getElementById('mobileMenuButton');
+            const mobileOverlay = document.getElementById('mobileOverlay');
             
             // Fonction pour basculer la sidebar
             function toggleSidebar() {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-                
-                // Mettre à jour l'icône du bouton
-                const icon = toggleBtn.querySelector('i');
-                if (sidebar.classList.contains('collapsed')) {
-                    icon.classList.remove('fa-chevron-left');
-                    icon.classList.add('fa-chevron-right');
+                if (window.innerWidth < 1024) {
+                    // Sur mobile, on utilise l'overlay
+                    sidebar.classList.toggle('mobile-open');
+                    mobileOverlay.classList.toggle('active');
                 } else {
-                    icon.classList.remove('fa-chevron-right');
-                    icon.classList.add('fa-chevron-left');
+                    // Sur desktop, on réduit/étend normalement
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                    
+                    // Mettre à jour l'icône du bouton
+                    const icon = toggleBtn.querySelector('i');
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                    }
                 }
             }
             
@@ -211,21 +264,132 @@
                 toggleBtn.addEventListener('click', toggleSidebar);
             }
             
+            // Mobile menu button
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebar.classList.add('mobile-open');
+                    mobileOverlay.classList.add('active');
+                });
+            }
+            
+            // Mobile overlay
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                });
+            }
+            
             // Gestion responsive
             function handleResize() {
                 if (window.innerWidth < 1024) {
+                    // Mode mobile/tablette
                     sidebar.classList.add('collapsed');
                     mainContent.classList.add('expanded');
+                    
+                    // Afficher le bouton menu mobile
+                    if (mobileMenuBtn) mobileMenuBtn.style.display = 'flex';
                 } else {
-                    sidebar.classList.remove('collapsed');
+                    // Mode desktop
+                    sidebar.classList.remove('collapsed', 'mobile-open');
                     mainContent.classList.remove('expanded');
+                    
+                    // Cacher le bouton menu mobile et l'overlay
+                    if (mobileMenuBtn) mobileMenuBtn.style.display = 'none';
+                    if (mobileOverlay) mobileOverlay.classList.remove('active');
                 }
             }
             
             // Écouter les changements de taille de fenêtre
             window.addEventListener('resize', handleResize);
             handleResize(); // Appel initial
+            
+            // Fermer le sidebar mobile quand on clique sur un élément de menu
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth < 1024) {
+                        sidebar.classList.remove('mobile-open');
+                        mobileOverlay.classList.remove('active');
+                    }
+                });
+            });
         });
     </script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const csrfToken = '{{ csrf_token() }}';
+
+    // ✅ Mise à jour quantité
+    document.querySelectorAll('.item').forEach(item => {
+        const id = item.dataset.id;
+        const countEl = item.querySelector('.count');
+        const decreaseBtn = item.querySelector('.decrease');
+        const increaseBtn = item.querySelector('.increase');
+
+        function updateQuantity(newQty){
+            fetch(/cart/${id}, {
+                method: 'PUT',
+                headers: { 'Content-Type':'application/json','X-CSRF-TOKEN':csrfToken },
+                body: JSON.stringify({ quantity:newQty })
+            })
+            .then(res => res.json())
+            .then(() => {
+                countEl.textContent = newQty;
+                refreshTotals();
+            });
+        }
+
+        decreaseBtn.addEventListener('click', () => {
+            let qty = parseInt(countEl.textContent);
+            if(qty > 1) updateQuantity(qty - 1);
+        });
+        increaseBtn.addEventListener('click', () => {
+            let qty = parseInt(countEl.textContent);
+            updateQuantity(qty + 1);
+        });
+    });
+
+    // ✅ Supprimer produit
+    document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', function(){
+            if(!confirm("Supprimer ce produit ?")) return;
+            const article = btn.closest('.item');
+            const id = article.dataset.id;
+            fetch(/cart/${id}, {
+                method:'DELETE',
+                headers:{ 'X-CSRF-TOKEN':csrfToken }
+            })
+            .then(res => res.json())
+            .then(() => {
+                article.remove();
+                refreshTotals();
+            });
+        });
+    });
+
+    // ✅ Vider panier
+    document.getElementById('clearCartBtn')?.addEventListener('click', () => {
+        if(!confirm("Voulez-vous vider le panier ?")) return;
+        fetch(/cart/clear, { method:'DELETE', headers:{ 'X-CSRF-TOKEN':csrfToken } })
+        .then(res => res.json())
+        .then(() => location.reload());
+    });
+
+    // 🔄 Recalcul totals (simple côté client)
+    function refreshTotals(){
+        let subtotal = 0;
+        document.querySelectorAll('.item').forEach(item => {
+            let qty = parseInt(item.querySelector('.count').textContent);
+            let unitPrice = parseInt(item.querySelector('.price').textContent.replace(/\D/g,'')) || 0;
+            subtotal += qty * unitPrice;
+        });
+        document.getElementById('subtotal').textContent = subtotal.toLocaleString() + " FCFA";
+        document.getElementById('grandTotal').textContent = (subtotal + 13).toLocaleString() + " FCFA";
+    }
+});
+</script>
 </body>
 </html>

@@ -383,11 +383,10 @@
     <!-- Header avec info du destinataire -->
     <div class="chat-header">
         <div class="user-avatar">
-            {{-- {{ strtoupper(substr($receiver_name, 0, 1)) }} --}}
+            A
         </div>
         <div class="user-info">
-            {{-- <h4>{{ $receiver_name }}</h4> --}}
-            <p id="userStatus">En ligne</p>
+            <h4>Service Client</h4>
         </div>
     </div>
     
@@ -398,7 +397,7 @@
                 <div class="empty-state">
                     <i>💬</i>
                     <p>Aucun message échangé pour le moment</p>
-                    <small>Envoyez votre premier message pour commencer la conversation</small>
+                    <small>Envoyez votre premier message</small>
                 </div>
             @else
                 <div class="date-divider">
@@ -457,7 +456,7 @@
             <div id="typingIndicator" class="msg-row msg-them" style="display: none;">
                 <div class="msg-container">
                     <div class="typing-indicator">
-                        {{-- <span>{{ $receiver_name }} est en train d'écrire</span> --}}
+                        <span>Service est en train d'écrire</span>
                         <div class="typing-dots">
                             <div class="typing-dot"></div>
                             <div class="typing-dot"></div>
