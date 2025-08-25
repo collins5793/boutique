@@ -55,9 +55,21 @@ Route::get('/shop', [ProductController::class, 'getActiveProductsByCategory'])->
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/dashboard', function () {
-    return view('client/dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('client/dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+use App\Http\Controllers\ClientDashboardController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard/orders', [ClientDashboardController::class, 'order'])->name('client.orders');
+    Route::get('/dashboard/panier', [ClientDashboardController::class, 'panier'])->name('client.panier');
+    Route::get('/dashboard/orders/{id}', [ClientDashboardController::class, 'ordershow'])->name('client.ordershow');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -79,7 +91,7 @@ Route::resource('roles', RoleController::class);
 Route::middleware(['auth'])->group(function() {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-    Route::patch('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::put('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 });

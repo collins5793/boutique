@@ -66,19 +66,46 @@ class CartController extends Controller
     }
 
     // Mettre à jour la quantité
-    public function update(Request $request, $id)
-    {
+    // public function update(Request $request, $id)
+    // {
+    //     $request->validate(['quantity' => 'required|integer|min:1']);
+
+    //     $cartItem = CartItem::where('id', $id)
+    //         ->where('user_id', Auth::id())
+    //         ->firstOrFail();
+
+    //     $cartItem->quantity = $request->quantity;
+    //     $cartItem->save();
+
+    //     return response()->json(['message' => 'Quantité mise à jour']);
+    // }
+
+    // Mettre à jour la quantité
+public function update(Request $request, $id)
+{
+    $cartItem = CartItem::where('id', $id)
+        ->where('user_id', Auth::id())
+        ->firstOrFail();
+
+    if ($request->action === 'increase') {
+        $cartItem->quantity += 1;
+    } elseif ($request->action === 'decrease') {
+        $cartItem->quantity = max(1, $cartItem->quantity - 1); // pas moins de 1
+    } else {
         $request->validate(['quantity' => 'required|integer|min:1']);
-
-        $cartItem = CartItem::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
         $cartItem->quantity = $request->quantity;
-        $cartItem->save();
-
-        return response()->json(['message' => 'Quantité mise à jour']);
     }
+
+    $cartItem->save();
+
+    return response()->json([
+        'message' => 'Quantité mise à jour',
+        'quantity' => $cartItem->quantity,
+        'subtotal' => $cartItem->quantity * $cartItem->price,
+        'subtotale' => $cartItem->quantity * $cartItem->discount_price
+    ]);
+}
+
 
     // Supprimer un produit du panier
     public function destroy($id)
