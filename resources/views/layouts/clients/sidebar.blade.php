@@ -77,7 +77,9 @@ $processingCount = Order::where('user_id', $user->id)
                 </li>
                 <li class="menu-item">
                     <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="menu-text">Fidélité & Récompenses</div>
+                                                            <a href="{{route('client.loyalty.index')}}">
+
+                    <div class="menu-text">Fidélité & Récompenses</div></a>
                     <div class="badge">3</div>
                     <div class="tooltip">Fidélité & Récompenses</div>
                 </li>
@@ -95,7 +97,9 @@ $processingCount = Order::where('user_id', $user->id)
                 </li>
                 <li class="menu-item">
                     <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
-                    <div class="menu-text">Support</div>
+                                                            <a href="{{route('support')}}">
+
+                    <div class="menu-text">Support</div></a>
                     <div class="tooltip">Support</div>
                 </li>
             </ul>

@@ -7,6 +7,17 @@
     <a href="{{ route('notifications.index') }}" class="back-button">
         <i class="fas fa-arrow-left"></i> Retour aux notifications
     </a>
+    @if(session('success'))
+    <div class="alert alert-success" style="margin-top:10px; border-radius:8px;">
+        {{ session('success') }}
+    </div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger" style="margin-top:10px; border-radius:8px;">
+        {{ session('error') }}
+    </div>
+@endif
+
 
     <div class="notification-card">
         <div class="notification-header">
@@ -50,9 +61,10 @@
             <div class="content-section">
                 <h3>Message</h3>
                 <div class="content-text">
-                    {{ $notification->content }}
+                    {{!! $notification->content !!}}
                 </div>
             </div>
+
 
             @if(isset($notification->data) && !empty($notification->data))
             <div class="content-section">
