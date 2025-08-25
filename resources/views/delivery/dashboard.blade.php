@@ -3,6 +3,7 @@
 @section('content')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #7c3aed;
@@ -100,12 +101,12 @@
         
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 25px;
             margin-bottom: 30px;
         }
         
-        @media (max-width: 992px) {
+        @media (max-width: 1200px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
@@ -136,6 +137,12 @@
         
         .card-body {
             padding: 20px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
         
         .order-item {
@@ -270,10 +277,13 @@
             .welcome-banner {
                 text-align: center;
             }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
-</head>
-<body>
+
     <div class="page-container">
         <!-- Bannière de bienvenue -->
         <div class="welcome-banner">
@@ -328,8 +338,20 @@
         
         <!-- Grid principal -->
         <div class="dashboard-grid">
-            <!-- Colonne gauche -->
+            <!-- Colonne gauche - Graphique et Commandes -->
             <div>
+                <!-- Graphique d'évolution -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <span>Évolution des livraisons (7 derniers jours)</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="deliveryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Commandes du jour -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -360,9 +382,35 @@
                         @endif
                     </div>
                 </div>
+            </div>
+            
+            <!-- Colonne droite - Performances et Actions -->
+            <div>
+                <!-- Performances -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <span>Ma performance</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="performance-grid">
+                            <div class="performance-item">
+                                <div class="performance-value">{{ $performance['success_rate'] }}%</div>
+                                <div class="performance-label">Taux de réussite</div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ $performance['success_rate'] }}%"
+                                 aria-valuenow="{{ $performance['success_rate'] }}" 
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-muted">Votre taux de livraison réussie</small>
+                    </div>
+                </div>
                 
                 <!-- Prochaines livraisons -->
-                <div class="card">
+                <div class="card mb-4">
                     <div class="card-header">
                         <span>Prochaines livraisons</span>
                         <span class="badge bg-warning">{{ $upcoming_deliveries->count() }}</span>
@@ -395,42 +443,6 @@
                                 <p>Toutes les commandes sont attribuées</p>
                             </div>
                         @endif
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Colonne droite -->
-            <div>
-                <!-- Performances -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <span>Mes performances</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="performance-grid">
-                            <div class="performance-item">
-                                <div class="performance-value">{{ $performance['success_rate'] }}%</div>
-                                <div class="performance-label">Taux de réussite</div>
-                            </div>
-                            
-                            <div class="performance-item">
-                                <div class="performance-value">{{ $performance['average_time'] }}</div>
-                                <div class="performance-label">Temps moyen</div>
-                            </div>
-                            
-                            <div class="performance-item">
-                                <div class="performance-value">{{ $performance['rating'] }}/5</div>
-                                <div class="performance-label">Évaluation</div>
-                            </div>
-                        </div>
-                        
-                        <div class="progress mb-3" style="height: 10px;">
-                            <div class="progress-bar bg-success" role="progressbar" 
-                                 style="width: {{ $performance['success_rate'] }}%"
-                                 aria-valuenow="{{ $performance['success_rate'] }}" 
-                                 aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <small class="text-muted">Votre taux de livraison réussie</small>
                     </div>
                 </div>
                 
@@ -475,5 +487,57 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Données du graphique depuis le contrôleur
+        const deliveryData = {
+            labels: {!! json_encode($chartData['labels']) !!},
+            datasets: {!! json_encode($chartData['datasets']) !!}
+        };
+
+        // Configuration du graphique
+        const config = {
+            type: 'line',
+            data: deliveryData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + ' livraison(s)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        },
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        };
+
+        // Création du graphique
+        const ctx = document.getElementById('deliveryChart').getContext('2d');
+        new Chart(ctx, config);
+    });
+</script>
 @endsection

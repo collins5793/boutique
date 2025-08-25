@@ -288,8 +288,6 @@
             transition: height 0.3s ease;
         }
     </style>
-</head>
-<body>
     <div class="page-container">
         <div class="page-header">
             <h1 class="page-title">Commandes en attente</h1>
@@ -349,11 +347,12 @@
                                 </div>
 
                                 <div class="action-buttons">
+                                    
+
+                                    @if($canRoute)
                                     <button class="btn btn-deliver start-delivery-btn" data-order-id="{{ $order->id }}">
                                         <i class="fas fa-truck"></i> Commencer la livraison
                                     </button>
-
-                                    @if($canRoute)
                                         <button class="btn btn-route view-route-btn"
                                                 data-lat="{{ $addr->latitude }}"
                                                 data-lng="{{ $addr->longitude }}"
@@ -361,6 +360,10 @@
                                                 data-address="{{ $addr->full_address }}">
                                             <i class="fas fa-route"></i> Voir l'itinéraire
                                         </button>
+                                        @else
+                                        <button class="btn btn-deliver start-delive-btn" data-order-id="{{ $order->id }}">
+                                        <i class="fas fa-truck"></i> Commencer la livraison
+                                    </button>
                                     @endif
                                 </div>
                             </div>
@@ -400,6 +403,30 @@
                 if(!confirm("Commencer la livraison de cette commande ?")) return;
 
                 fetch(`/delivery/start/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert("Une erreur est survenue");
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+        });
+        document.querySelectorAll('.start-delive-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orderId = this.dataset.orderId;
+
+                if(!confirm("Commencer la livraison de cette commande ?")) return;
+
+                fetch(`/delive/start/${orderId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

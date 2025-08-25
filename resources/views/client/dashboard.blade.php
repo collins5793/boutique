@@ -3,216 +3,218 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="dashboard-wrapper">
+<div class="dashboard-content">
+    <div class="dashboard-wrapper">
 
-    {{-- 🖼 En-tête / Bienvenue + raccourcis --}}
-    <div class="welcome-section">
-        <div class="welcome-content">
-            <h2 class="welcome-title">Bienvenue, {{ $user->name }} 👋</h2>
-            <p class="welcome-date">{{ now()->translatedFormat('l d F Y') }}</p>
+        {{-- 🖼 En-tête / Bienvenue + raccourcis --}}
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <h2 class="welcome-title">Bienvenue, {{ $user->name }} 👋</h2>
+                <p class="welcome-date">{{ now()->translatedFormat('l d F Y') }}</p>
+            </div>
+            <div class="welcome-actions">
+                <a href="" class="action-btn primary">
+                    <i class="fas fa-shopping-cart"></i>
+                    {{-- Passer une commande --}}
+                </a>
+                <a href="" class="action-btn secondary">
+                    <i class="fas fa-list"></i>
+                    {{-- Voir mes commandes --}}
+                </a>
+                <a href="" class="action-btn tertiary">
+                    <i class="fas fa-headset"></i>
+                    {{-- Support --}}
+                </a>
+            </div>
         </div>
-        <div class="welcome-actions">
-            <a href="" class="action-btn primary">
-                <i class="fas fa-shopping-cart"></i>
-                {{-- Passer une commande --}}
-            </a>
-            <a href="" class="action-btn secondary">
-                <i class="fas fa-list"></i>
-                {{-- Voir mes commandes --}}
-            </a>
-            <a href="" class="action-btn tertiary">
-                <i class="fas fa-headset"></i>
-                {{-- Support --}}
-            </a>
-        </div>
-    </div>
 
-    {{-- ⚡ Widgets rapides --}}
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-shopping-bag"></i>
+        {{-- ⚡ Widgets rapides --}}
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ $totalOrders }}</div>
+                    <div class="stat-label">Commandes totales</div>
+                </div>
             </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ $totalOrders }}</div>
-                <div class="stat-label">Commandes totales</div>
+            <div class="stat-card">
+                <div class="stat-icon in-progress">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ $ordersInProgress }}</div>
+                    <div class="stat-label">En cours</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon revenue">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ number_format($totalSpent, 0, ',', ' ') }} <span class="currency">FCFA</span></div>
+                    <div class="stat-label">Total dépensé</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon loyalty">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ $loyaltyPoints }}</div>
+                    <div class="stat-label">Points fidélité</div>
+                </div>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon in-progress">
-                <i class="fas fa-truck"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ $ordersInProgress }}</div>
-                <div class="stat-label">En cours</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon revenue">
-                <i class="fas fa-credit-card"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ number_format($totalSpent, 0, ',', ' ') }} <span class="currency">FCFA</span></div>
-                <div class="stat-label">Total dépensé</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon loyalty">
-                <i class="fas fa-gift"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ $loyaltyPoints }}</div>
-                <div class="stat-label">Points fidélité</div>
-            </div>
-        </div>
-    </div>
 
-    {{-- 📈 Graphiques principaux --}}
-    <div class="charts-grid">
-        <div class="chart-container">
-            <div class="chart-header">
-                <h3>Statut des commandes</h3>
+        {{-- 📈 Graphiques principaux --}}
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Statut des commandes</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="ordersByStatusChart"></canvas>
+                </div>
             </div>
-            <div class="chart-wrapper">
-                <canvas id="ordersByStatusChart"></canvas>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Historique des commandes & dépenses</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="monthlyStatsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Produits les plus commandés</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
             </div>
         </div>
-        
-        <div class="chart-container">
-            <div class="chart-header">
-                <h3>Historique des commandes & dépenses</h3>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="monthlyStatsChart"></canvas>
-            </div>
-        </div>
-        
-        <div class="chart-container">
-            <div class="chart-header">
-                <h3>Produits les plus commandés</h3>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="topProductsChart"></canvas>
-            </div>
-        </div>
-    </div>
 
-    {{-- 💰 Dépenses annuelles --}}
-    <div class="revenue-section">
-        <div class="revenue-card">
-            <div class="revenue-icon">
-                <i class="fas fa-calendar-alt"></i>
+        {{-- 💰 Dépenses annuelles --}}
+        <div class="revenue-section">
+            <div class="revenue-card">
+                <div class="revenue-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="revenue-content">
+                    <div class="revenue-label">Dépenses {{ now()->year }}</div>
+                    <div class="revenue-value">{{ number_format($spentThisYear, 0, ',', ' ') }} <span class="currency">FCFA</span></div>
+                </div>
             </div>
-            <div class="revenue-content">
-                <div class="revenue-label">Dépenses {{ now()->year }}</div>
-                <div class="revenue-value">{{ number_format($spentThisYear, 0, ',', ' ') }} <span class="currency">FCFA</span></div>
+            
+            <div class="revenue-card">
+                <div class="revenue-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="revenue-content">
+                    <div class="revenue-label">Moyenne mensuelle</div>
+                    <div class="revenue-value">{{ number_format($avgPerMonth, 0, ',', ' ') }} <span class="currency">FCFA</span></div>
+                </div>
             </div>
         </div>
-        
-        <div class="revenue-card">
-            <div class="revenue-icon">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="revenue-content">
-                <div class="revenue-label">Moyenne mensuelle</div>
-                <div class="revenue-value">{{ number_format($avgPerMonth, 0, ',', ' ') }} <span class="currency">FCFA</span></div>
-            </div>
-        </div>
-    </div>
 
-    {{-- 📑 Commandes récentes et Top produits --}}
-    <div class="data-grid">
-        <div class="data-section">
-            <div class="section-header">
-                <h3><i class="fas fa-history"></i> Commandes récentes</h3>
-                <a href="#" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>N° Commande</th>
-                            <th>Date</th>
-                            <th>Montant</th>
-                            <th>Statut</th>
-                            <th>Paiement</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentOrders as $o)
+        {{-- 📑 Commandes récentes et Top produits --}}
+        <div class="data-grid">
+            <div class="data-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-history"></i> Commandes récentes</h3>
+                    <a href="#" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
                             <tr>
-                                <td class="order-number">#{{ $o->order_number }}</td>
-                                <td class="order-date">{{ \Carbon\Carbon::parse($o->created_at)->format('d M Y') }}</td>
-                                <td class="order-amount">{{ number_format($o->total_amount, 0, ',', ' ') }} FCFA</td>
-                                <td class="order-status">
-                                    <span class="status-badge status-{{ $o->order_status }}">{{ ucfirst($o->order_status) }}</span>
-                                </td>
-                                <td class="order-payment">{{ str_replace('_',' ', $o->payment_method) }}</td>
-                                <td class="order-actions">
-                                    <button class="action-icon" title="Voir détails">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </td>
+                                <th>N° Commande</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Paiement</th>
+                                <th>Actions</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="no-data">
-                                    <i class="fas fa-inbox"></i>
-                                    Aucune commande récente
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse($recentOrders as $o)
+                                <tr>
+                                    <td class="order-number">#{{ $o->order_number }}</td>
+                                    <td class="order-date">{{ \Carbon\Carbon::parse($o->created_at)->format('d M Y') }}</td>
+                                    <td class="order-amount">{{ number_format($o->total_amount, 0, ',', ' ') }} FCFA</td>
+                                    <td class="order-status">
+                                        <span class="status-badge status-{{ $o->order_status }}">{{ ucfirst($o->order_status) }}</span>
+                                    </td>
+                                    <td class="order-payment">{{ str_replace('_',' ', $o->payment_method) }}</td>
+                                    <td class="order-actions">
+                                        <button class="action-icon" title="Voir détails">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="no-data">
+                                        <i class="fas fa-inbox"></i>
+                                        Aucune commande récente
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <div class="data-section">
-            <div class="section-header">
-                <h3><i class="fas fa-star"></i> Produits populaires</h3>
-            </div>
-            <div class="products-list">
-                @if($topProducts->count())
-                    @foreach($topProducts as $p)
-                        <div class="product-item">
-                            <div class="product-image">
-                                @if(!empty($p->image))
-                                    <img src="{{ asset($p->image) }}" alt="{{ $p->name }}">
-                                @else
-                                    <div class="product-placeholder">
-                                        <i class="fas fa-box"></i>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="product-info">
-                                <h4 class="product-name">{{ $p->name }}</h4>
-                                <div class="product-stats">
-                                    <span class="product-quantity">
-                                        <i class="fas fa-shopping-basket"></i>
-                                        {{ (int)$p->qty }} acheté(s)
-                                    </span>
-                                    <span class="product-spent">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                        {{ number_format($p->spent, 0, ',', ' ') }} FCFA
-                                    </span>
+            <div class="data-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-star"></i> Produits populaires</h3>
+                </div>
+                <div class="products-list">
+                    @if($topProducts->count())
+                        @foreach($topProducts as $p)
+                            <div class="product-item">
+                                <div class="product-image">
+                                    @if(!empty($p->image))
+                                        <img src="{{ asset($p->image) }}" alt="{{ $p->name }}">
+                                    @else
+                                        <div class="product-placeholder">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    @endif
                                 </div>
+                                <div class="product-info">
+                                    <h4 class="product-name">{{ $p->name }}</h4>
+                                    <div class="product-stats">
+                                        <span class="product-quantity">
+                                            <i class="fas fa-shopping-basket"></i>
+                                            {{ (int)$p->qty }} acheté(s)
+                                        </span>
+                                        <span class="product-spent">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                            {{ number_format($p->spent, 0, ',', ' ') }} FCFA
+                                        </span>
+                                    </div>
+                                </div>
+                                <button class="product-action">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                             </div>
-                            <button class="product-action">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                        @endforeach
+                    @else
+                        <div class="no-products">
+                            <i class="fas fa-box-open"></i>
+                            <p>Pas encore assez d'achats pour établir un classement</p>
                         </div>
-                    @endforeach
-                @else
-                    <div class="no-products">
-                        <i class="fas fa-box-open"></i>
-                        <p>Pas encore assez d'achats pour établir un classement</p>
-                    </div>
-                @endif
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 
+    </div>
 </div>
 
 <style>
@@ -730,313 +732,309 @@
 {{-- Chart.js --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Données PHP -> JS
-    const donutLabels = @json($ordersByStatus['labels']);
-    const donutValues = @json($ordersByStatus['values']);
+    // Attendre que le DOM soit chargé
+    document.addEventListener('DOMContentLoaded', function() {
+        // Données PHP -> JS
+        const donutLabels = @json($ordersByStatus['labels']);
+        const donutValues = @json($ordersByStatus['values']);
 
-    const months = @json($monthlyStats->pluck('ym')); // ex: "2025-01"
-    const monthLabels = months.map(m => {
-        const [y,mo] = m.split('-'); 
-        const d = new Date(parseInt(y), parseInt(mo)-1, 1);
-        return d.toLocaleDateString('fr-FR', { month:'short', year:'numeric' });
-    });
-    const monthOrders = @json($monthlyStats->pluck('total_orders')->map(fn($v)=>(int)$v));
-    const monthSpent  = @json($monthlyStats->pluck('total_spent')->map(fn($v)=>(float)$v));
+        const monthlyStatsData = @json($monthlyStats);
+        const months = monthlyStatsData.map(item => item.ym);
+        const monthLabels = months.map(m => {
+            const [y,mo] = m.split('-'); 
+            const d = new Date(parseInt(y), parseInt(mo)-1, 1);
+            return d.toLocaleDateString('fr-FR', { month:'short', year:'numeric' });
+        });
+        const monthOrders = monthlyStatsData.map(item => parseInt(item.total_orders));
+        const monthSpent  = monthlyStatsData.map(item => parseFloat(item.total_spent));
 
-    // Données pour les produits les plus commandés
-    const topProducts = @json($topProducts);
-    const productNames = topProducts.map(p => p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name);
-    const productQuantities = topProducts.map(p => parseInt(p.qty));
-    const productSpent = topProducts.map(p => parseFloat(p.spent));
+        // Données pour les produits les plus commandés
+        const topProducts = @json($topProducts);
+        const productNames = topProducts.map(p => p.name.length > 20 ? p.name.substring(0, 20) + '...' : p.name);
+        const productQuantities = topProducts.map(p => parseInt(p.qty));
+        const productSpent = topProducts.map(p => parseFloat(p.spent));
 
-    // Couleurs pour les graphiques utilisant votre palette
-    const chartColors = {
-        primary: ['#f506c4', '#ff33d1', '#c0049b', '#ff7b00', '#007bff'],
-        secondary: ['#6a11cb', '#2575fc', '#4A00E0', '#8E2DE2', '#00B4DB'],
-        status: ['#10B981', '#FBBF24', '#3B82F6', '#EF4444', '#A78BFA', '#F472B6', '#60A5FA']
-    };
+        // Couleurs pour les graphiques utilisant votre palette
+        const chartColors = {
+            primary: ['#f506c4', '#ff33d1', '#c0049b', '#ff7b00', '#007bff'],
+            secondary: ['#6a11cb', '#2575fc', '#4A00E0', '#8E2DE2', '#00B4DB'],
+            status: ['#10B981', '#FBBF24', '#3B82F6', '#EF4444', '#A78BFA', '#F472B6', '#60A5FA']
+        };
 
-    // 📦 Donut "Commandes par statut"
-    const statusChart = new Chart(document.getElementById('ordersByStatusChart'), {
-        type: 'doughnut',
-        data: {
-            labels: donutLabels,
-            datasets: [{
-                data: donutValues,
-                backgroundColor: chartColors.primary,
-                borderWidth: 0,
-                hoverOffset: 12
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        color: '#1e293b'
-                    }
+        // 📦 Donut "Commandes par statut"
+        const statusCtx = document.getElementById('ordersByStatusChart');
+        if (statusCtx) {
+            const statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: donutLabels,
+                    datasets: [{
+                        data: donutValues,
+                        backgroundColor: chartColors.primary,
+                        borderWidth: 0,
+                        hoverOffset: 12
+                    }]
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = Math.round((value / total) * 100);
-                            return ${label}: ${value} (${percentage}%);
-                        }
-                    }
-                }
-            },
-            cutout: '70%',
-            animation: {
-                animateScale: true,
-                animateRotate: true
-            }
-        }
-    });
-
-    // ⏱ Historique (barres + ligne)
-    const monthlyChart = new Chart(document.getElementById('monthlyStatsChart'), {
-        type: 'bar',
-        data: {
-            labels: monthLabels,
-            datasets: [
-                {
-                    type: 'bar',
-                    label: 'Commandes',
-                    data: monthOrders,
-                    backgroundColor: chartColors.primary[0],
-                    borderColor: chartColors.primary[0],
-                    borderWidth: 0,
-                    borderRadius: 6,
-                    barPercentage: 0.6,
-                    categoryPercentage: 0.7
-                },
-                {
-                    type: 'line',
-                    label: 'Dépenses (FCFA)',
-                    data: monthSpent,
-                    borderColor: chartColors.primary[4],
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        drawBorder: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Nombre de commandes',
-                        color: '#334155'
-                    },
-                    ticks: {
-                        color: '#334155'
-                    }
-                },
-                y1: {
-                    beginAtZero: true,
-                    position: 'right',
-                    grid: {
-                        drawOnChartArea: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Dépenses (FCFA)',
-                        color: '#334155'
-                    },
-                    ticks: {
-                        color: '#334155',
-                        callback: function(value) {
-                            return new Intl.NumberFormat('fr-FR').format(value);
-                        }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#334155'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        color: '#1e293b',
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    titleColor: '#1e293b',
-                    bodyColor: '#334155',
-                    borderColor: '#e2e8f0',
-                    borderWidth: 1,
-                    cornerRadius: 8,
-                    usePointStyle: true,
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#1e293b'
                             }
-                            if (context.parsed.y !== null) {
-                                if (context.dataset.yAxisID === 'y1') {
-                                    label += new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
-                                } else {
-                                    label += context.parsed.y;
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return label + ': ' + value + ' (' + percentage + '%)';
                                 }
                             }
-                            return label;
                         }
+                    },
+                    cutout: '70%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
                     }
                 }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeOutQuart'
-            }
+            });
         }
-    });
 
-    // 📊 Graphique des produits les plus commandés
-    const topProductsChart = new Chart(document.getElementById('topProductsChart'), {
-        type: 'bar',
-        data: {
-            labels: productNames,
-            datasets: [
-                {
-                    label: 'Quantité commandée',
-                    data: productQuantities,
-                    backgroundColor: chartColors.primary[0],
-                    borderColor: chartColors.primary[0],
-                    borderWidth: 0,
-                    borderRadius: 6,
-                    barPercentage: 0.7
-                },
-                {
-                    label: 'Montant dépensé (FCFA)',
-                    data: productSpent,
-                    backgroundColor: chartColors.primary[4],
-                    borderColor: chartColors.primary[4],
-                    borderWidth: 0,
-                    borderRadius: 6,
-                    barPercentage: 0.7,
-                    yAxisID: 'y1'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    grid: {
-                        drawBorder: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Quantité',
-                        color: '#334155'
-                    },
-                    ticks: {
-                        color: '#334155'
-                    }
-                },
-                x1: {
-                    beginAtZero: true,
-                    position: 'top',
-                    grid: {
-                        drawOnChartArea: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Montant (FCFA)',
-                        color: '#334155'
-                    },
-                    ticks: {
-                        color: '#334155',
-                        callback: function(value) {
-                            return new Intl.NumberFormat('fr-FR').format(value);
+        // ⏱ Historique (barres + ligne)
+        const monthlyCtx = document.getElementById('monthlyStatsChart');
+        if (monthlyCtx) {
+            const monthlyChart = new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Commandes',
+                            data: monthOrders,
+                            backgroundColor: chartColors.primary[0],
+                            borderColor: chartColors.primary[0],
+                            borderWidth: 0,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.7
+                        },
+                        {
+                            type: 'line',
+                            label: 'Dépenses (FCFA)',
+                            data: monthSpent,
+                            borderColor: chartColors.primary[4],
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            yAxisID: 'y1'
                         }
-                    }
+                    ]
                 },
-                y: {
-                    grid: {
-                        display: false
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     },
-                    ticks: {
-                        color: '#334155'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        color: '#1e293b',
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    titleColor: '#1e293b',
-                    bodyColor: '#334155',
-                    borderColor: '#e2e8f0',
-                    borderWidth: 1,
-                    cornerRadius: 8,
-                    usePointStyle: true,
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Nombre de commandes',
+                                color: '#334155'
+                            },
+                            ticks: {
+                                color: '#334155'
                             }
-                            if (context.parsed.x !== null) {
-                                if (context.dataset.yAxisID === 'y1') {
-                                    label += new Intl.NumberFormat('fr-FR').format(context.parsed.x) + ' FCFA';
-                                } else {
-                                    label += context.parsed.x;
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Dépenses (FCFA)',
+                                color: '#334155'
+                            },
+                            ticks: {
+                                color: '#334155',
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('fr-FR').format(value);
                                 }
                             }
-                            return label;
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#334155'
+                            }
                         }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#1e293b',
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#334155',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        if (context.dataset.yAxisID === 'y1') {
+                                            label += new Intl.NumberFormat('fr-FR').format(context.parsed.y) + ' FCFA';
+                                        } else {
+                                            label += context.parsed.y;
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
                     }
                 }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeOutQuart'
-            }
+            });
+        }
+
+        // 📊 Graphique des produits les plus commandés
+        const topProductsCtx = document.getElementById('topProductsChart');
+        if (topProductsCtx) {
+            const topProductsChart = new Chart(topProductsCtx, {
+                type: 'bar',
+                data: {
+                    labels: productNames,
+                    datasets: [
+                        {
+                            label: 'Quantité commandée',
+                            data: productQuantities,
+                            backgroundColor: chartColors.primary[0],
+                            borderColor: chartColors.primary[0],
+                            borderWidth: 0,
+                            borderRadius: 6,
+                            barPercentage: 0.7
+                        },
+                        {
+                            label: 'Montant dépensé (FCFA)',
+                            data: productSpent,
+                            backgroundColor: chartColors.primary[4],
+                            borderColor: chartColors.primary[4],
+                            borderWidth: 0,
+                            borderRadius: 6,
+                            barPercentage: 0.7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Quantité / Montant',
+                                color: '#334155'
+                            },
+                            ticks: {
+                                color: '#334155',
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('fr-FR').format(value);
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#334155'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#1e293b',
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#334155',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += new Intl.NumberFormat('fr-FR').format(context.parsed.x);
+                                        if (context.datasetIndex === 1) {
+                                            label += ' FCFA';
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
         }
     });
 </script>

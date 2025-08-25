@@ -13,6 +13,7 @@ use App\Http\Controllers\DeliveryAddressController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ChatbotResponseController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoyaltyPointController;
 use App\Http\Controllers\NotificationController;
 
 
@@ -55,9 +56,9 @@ Route::get('/shop', [ProductController::class, 'getActiveProductsByCategory'])->
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Route::get('/dashboard', function () {
-//     return view('client/dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/support', function () {
+    return view('support');
+})->middleware(['auth', 'verified'])->name('support');
 
 use App\Http\Controllers\ClientDashboardController;
 
@@ -68,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/orders', [ClientDashboardController::class, 'order'])->name('client.orders');
     Route::get('/dashboard/panier', [ClientDashboardController::class, 'panier'])->name('client.panier');
+    Route::get('/dashboard/recompense', [LoyaltyPointController::class, 'index'])->name('client.loyalty.index');
     Route::get('/dashboard/orders/{id}', [ClientDashboardController::class, 'ordershow'])->name('client.ordershow');
 });
 

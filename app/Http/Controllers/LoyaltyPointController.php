@@ -4,62 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\LoyaltyPoint;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoyaltyPointController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+   public function index()
     {
-        //
-    }
+        $user = Auth::user();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        // Total des points
+        $totalPoints = LoyaltyPoint::where('user_id', $user->id)->sum('points');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // Historique des points
+        $history = LoyaltyPoint::where('user_id', $user->id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(LoyaltyPoint $loyaltyPoint)
-    {
-        //
-    }
+        // Graphique : points par mois
+        $pointsByMonth = LoyaltyPoint::selectRaw('MONTH(created_at) as month, SUM(points) as total')
+            ->where('user_id', $user->id)
+            ->groupBy('month')
+            ->pluck('total', 'month');
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(LoyaltyPoint $loyaltyPoint)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, LoyaltyPoint $loyaltyPoint)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(LoyaltyPoint $loyaltyPoint)
-    {
-        //
+        return view('client.loyalty.index', compact('totalPoints', 'history', 'pointsByMonth'));
     }
 }

@@ -6,7 +6,7 @@
 <div class="container">
 
     {{-- Statistiques --}}
-    <h2 class="mb-4">🛍 Mes commandes</h2>
+    <h2 class="mb-4">🛍 Mes commndes</h2>
     <div class="row mb-4">
         @foreach($stats as $key => $value)
             <div class="col-md-2">
