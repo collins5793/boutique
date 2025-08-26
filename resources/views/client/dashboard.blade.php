@@ -3,7 +3,6 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="dashboard-content">
     <div class="dashboard-wrapper">
 
         {{-- 🖼 En-tête / Bienvenue + raccourcis --}}
@@ -13,15 +12,15 @@
                 <p class="welcome-date">{{ now()->translatedFormat('l d F Y') }}</p>
             </div>
             <div class="welcome-actions">
-                <a href="" class="action-btn primary">
+                <a href="{{ route('client.panier') }}" class="action-btn primary">
                     <i class="fas fa-shopping-cart"></i>
                     {{-- Passer une commande --}}
                 </a>
-                <a href="" class="action-btn secondary">
+                <a href="{{ route('client.orders') }}" class="action-btn secondary">
                     <i class="fas fa-list"></i>
                     {{-- Voir mes commandes --}}
                 </a>
-                <a href="" class="action-btn tertiary">
+                <a href="{{ route('client.support') }}" class="action-btn tertiary">
                     <i class="fas fa-headset"></i>
                     {{-- Support --}}
                 </a>
@@ -126,7 +125,7 @@
             <div class="data-section">
                 <div class="section-header">
                     <h3><i class="fas fa-history"></i> Commandes récentes</h3>
-                    <a href="#" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
+                    <a href="{{ route('client.orders') }}" class="view-all">Voir tout <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -137,12 +136,11 @@
                                 <th>Montant</th>
                                 <th>Statut</th>
                                 <th>Paiement</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($recentOrders as $o)
-                                <tr>
+                                <tr style="cursor:pointer;" onclick="window.location='{{ route('client.ordershow', $o->id) }}'">
                                     <td class="order-number">#{{ $o->order_number }}</td>
                                     <td class="order-date">{{ \Carbon\Carbon::parse($o->created_at)->format('d M Y') }}</td>
                                     <td class="order-amount">{{ number_format($o->total_amount, 0, ',', ' ') }} FCFA</td>
@@ -150,11 +148,6 @@
                                         <span class="status-badge status-{{ $o->order_status }}">{{ ucfirst($o->order_status) }}</span>
                                     </td>
                                     <td class="order-payment">{{ str_replace('_',' ', $o->payment_method) }}</td>
-                                    <td class="order-actions">
-                                        <button class="action-icon" title="Voir détails">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
@@ -179,7 +172,7 @@
                             <div class="product-item">
                                 <div class="product-image">
                                     @if(!empty($p->image))
-                                        <img src="{{ asset($p->image) }}" alt="{{ $p->name }}">
+                                        <img src="{{ asset('storage/' . $p->image) }}" alt="{{ $p->name }}" loading="lazy">
                                     @else
                                         <div class="product-placeholder">
                                             <i class="fas fa-box"></i>
@@ -195,7 +188,7 @@
                                         </span>
                                         <span class="product-spent">
                                             <i class="fas fa-money-bill-wave"></i>
-                                            {{ number_format($p->spent, 0, ',', ' ') }} FCFA
+                                            {{-- {{ number_format($p->spent, 0, ',', ' ') }} FCFA --}}
                                         </span>
                                     </div>
                                 </div>
@@ -215,7 +208,6 @@
         </div>
 
     </div>
-</div>
 
 <style>
     /* Styles pour le dashboard avec vos couleurs */

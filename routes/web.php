@@ -12,6 +12,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DeliveryAddressController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ChatbotResponseController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoyaltyPointController;
 use App\Http\Controllers\NotificationController;
@@ -56,9 +57,9 @@ Route::get('/shop', [ProductController::class, 'getActiveProductsByCategory'])->
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/support', function () {
-    return view('support');
-})->middleware(['auth', 'verified'])->name('support');
+Route::get('/dashboard/support', function () {
+    return view('client/support');
+})->middleware(['auth', 'verified'])->name('client.support');
 
 use App\Http\Controllers\ClientDashboardController;
 
@@ -71,8 +72,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/panier', [ClientDashboardController::class, 'panier'])->name('client.panier');
     Route::get('/dashboard/shop', [ClientDashboardController::class, 'shop'])->name('client.shop');
     Route::get('/dashboard/recompense', [LoyaltyPointController::class, 'index'])->name('client.loyalty.index');
+    Route::get('/menu-counts', [ClientDashboardController::class, 'counts'])->name('menu.counts');
     Route::get('/dashboard/orders/{id}', [ClientDashboardController::class, 'ordershow'])->name('client.ordershow');
 });
+
+Route::get('/counts', function() {
+ 
+});
+
+Route::prefix('dashboard')->middleware('auth')->group(function () {
+    Route::get('settings', [SettingController::class, 'index'])->name('client.settings');
+    Route::post('settings/profile', [SettingController::class, 'updateProfile'])->name('client.settings.profile');
+    Route::post('settings/password', [SettingController::class, 'updatePassword'])->name('client.settings.password');
+    Route::post('settings/preferences', [SettingController::class, 'updatePreferences'])->name('client.settings.preferences');
+});
+
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
