@@ -221,6 +221,7 @@
             {{-- Section personnalisée --}}
             <div class="dashboard-content">
                 <!-- Contenu spécifique à la page -->
+                @include('partials.notifications')
                 @yield('content')
             </div>
         </div>

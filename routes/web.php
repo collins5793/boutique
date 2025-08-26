@@ -130,6 +130,12 @@ Route::get('/delivery/delivered-orders', [DeliveryController::class, 'deliveredO
     ->name('delivery.delivered-orders');
 Route::get('/delivery/dashboard', [DeliveryController::class, 'dashboard'])
     ->name('delivery.dashboard');
+Route::prefix('livreur')->middleware(['auth'])->group(function () {
+    // ... autres routes existantes ...
+    Route::get('/support', [DeliveryController::class, 'support'])->name('livreur.support');
+    Route::post('/support/ticket', [DeliveryController::class, 'createSupportTicket'])->name('livreur.support.ticket');
+    Route::get('/support/faq', [DeliveryController::class, 'faq'])->name('livreur.faq');
+});
 
 
 Route::prefix('messages')->middleware('auth')->group(function () {

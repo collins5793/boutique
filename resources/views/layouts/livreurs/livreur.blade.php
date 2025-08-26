@@ -93,6 +93,7 @@
 
             {{-- Contenu page --}}
             <div class="dashboard-content">
+                @include('partials.notifications')
                 @yield('content')
             </div>
         </div>

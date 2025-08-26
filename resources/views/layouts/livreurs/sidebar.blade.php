@@ -30,13 +30,6 @@
                         <div class="tooltip">Mes Livraisons Effectuées</div>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <div class="menu-icon"><i class="fas fa-users"></i></div>
-                        <div class="menu-text">Clients</div>
-                        <div class="tooltip">Clients</div>
-                    </a>
-                </li>
             </ul>
         </div>
 
@@ -51,7 +44,7 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
+                    <a href="{{ route('livreur.support') }}" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
                         <div class="menu-text">Support</div>
                         <div class="tooltip">Support</div>

@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\Notification;
 use App\Models\DeliveryAddress;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // ← ajouter ceci
@@ -418,6 +419,102 @@ private function getDeliveryChartData($userId)
             ]
         ]
     ];
+}
+
+public function support()
+{
+    // Vérifier si l'utilisateur est un livreur (basé sur les livraisons)
+    $userDeliveries = Delivery::where('delivery_person_id', auth()->id())->count();
+    
+    if ($userDeliveries === 0) {
+        abort(403, 'Accès réservé aux livreurs');
+    }
+
+    $faqCategories = [
+        'livraison' => [
+            'question' => 'Comment marquer une livraison comme complétée ?',
+            'reponse' => 'Cliquez sur le bouton "Livraison effectuée" dans les détails de la commande.'
+        ],
+        'technique' => [
+            'question' => 'Problèmes de géolocalisation',
+            'reponse' => 'Vérifiez que la localisation est activée sur votre appareil.'
+        ],
+        'paiement' => [
+            'question' => 'Quand serai-je payé ?',
+            'reponse' => 'Les paiements sont effectués chaque vendredi.'
+        ]
+    ];
+
+    $contacts = [
+        [
+            'service' => 'Support Technique',
+            'telephone' => '+229 01 02 03 04',
+            'email' => 'tech@akuesleystore.bj',
+            'horaires' => 'Lun-Ven: 8h-18h'
+        ],
+        [
+            'service' => 'Urgences Livraison',
+            'telephone' => '+229 05 06 07 08',
+            'email' => 'urgent@akuesleystore.bj',
+            'horaires' => '24h/24 - 7j/7'
+        ]
+    ];
+
+    return view('delivery.support', compact('faqCategories', 'contacts'));
+}
+
+public function createSupportTicket(Request $request)
+{
+    // Vérification livreur
+    $userDeliveries = Delivery::where('delivery_person_id', auth()->id())->count();
+    if ($userDeliveries === 0) {
+        abort(403, 'Accès réservé aux livreurs');
+    }
+
+    $validated = $request->validate([
+        'sujet' => 'required|string|max:200',
+        'message' => 'required|string|min:10|max:1000',
+        'categorie' => 'required|in:technique,livraison,paiement,autre',
+        'urgence' => 'required|in:normal,urgent'
+    ]);
+
+    // Envoyer l'email de support
+    Mail::send('emails.support-ticket', $validated, function($message) use ($validated) {
+        $message->to('moussaamir12346@gmail.com')
+                ->subject('[Support Livreur] ' . $validated['sujet'])
+                ->replyTo(auth()->user()->email);
+    });
+
+    return redirect()->back()->with('success', 'Votre message a été envoyé au support !');
+}
+
+public function faq()
+{
+    $userDeliveries = Delivery::where('delivery_person_id', auth()->id())->count();
+    if ($userDeliveries === 0) {
+        abort(403, 'Accès réservé aux livreurs');
+    }
+
+    $faqs = [
+        [
+            'question' => 'Comment accepter une livraison ?',
+            'reponse' => 'Dans la liste des commandes, cliquez sur "Accepter la livraison".'
+        ],
+        [
+            'question' => 'Que faire si le client est absent ?',
+            'reponse' => 'Contactez le support au +229 01 02 03 04 pour instructions.'
+        ],
+        [
+            'question' => 'Comment sont calculés mes gains ?',
+            'reponse' => 'Vous gagnez 500 FCFA par livraison + bonus selon la distance.'
+        ],
+        [
+            'question' => 'Problème avec l\'application ?',
+            'reponse' => 'Redémarrez l\'application ou contactez le support technique.'
+        ]
+    ];
+
+    return view('delivery.faq', compact('faqs'));
 }
 
 
