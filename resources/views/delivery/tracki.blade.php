@@ -271,13 +271,6 @@
                     <i class="fas fa-check-circle"></i> Livrer cette commande
                 </button>
             </form>
-
-            <form action="{{ route('delivery.valide', $order->id) }}" method="POST" class="d-flex flex-fill">
-                @csrf
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-clipboard-check"></i> Marquer comme terminée
-                </button>
-            </form>
         </div>
     </div>
 
