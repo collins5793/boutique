@@ -147,6 +147,10 @@ Route::get('/delivery/dashboard', [DeliveryController::class, 'dashboard'])
     ->name('delivery.dashboard');
 Route::prefix('livreur')->middleware(['auth'])->group(function () {
     // ... autres routes existantes ...
+    Route::get('settings', [SettingController::class, 'indexl'])->name('livreur.settings');
+    Route::post('settings/profile', [SettingController::class, 'updateProfilel'])->name('livreur.settings.profile');
+    Route::post('settings/password', [SettingController::class, 'updatePasswordl'])->name('livreur.settings.password');
+    Route::post('settings/preferences', [SettingController::class, 'updatePreferencesl'])->name('livreur.settings.preferences');
     Route::get('/support', [DeliveryController::class, 'support'])->name('livreur.support');
     Route::post('/support/ticket', [DeliveryController::class, 'createSupportTicket'])->name('livreur.support.ticket');
     Route::get('/support/faq', [DeliveryController::class, 'faq'])->name('livreur.faq');
