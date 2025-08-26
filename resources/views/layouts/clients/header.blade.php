@@ -29,6 +29,28 @@
             z-index: 900;
             transition: var(--transition);
         }
+
+        /* Conteneur du logo */
+.logo-boutique {
+    display: flex;          /* Pour aligner le logo si tu ajoutes du texte à côté */
+    align-items: center;    /* Centrer verticalement */
+    background-color: none; /* Couleur de fond, modifiable */
+    cursor: pointer;        /* Curseur pointer si cliquable */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Effet au survol */
+.logo-boutique:hover {
+    transform: scale(1.05);    /* Légère augmentation de taille */
+}
+
+/* Image du logo */
+.logo-boutique img {
+    height: 80px;        /* Ajuster la hauteur du logo */
+    width: auto;         /* Largeur proportionnelle */
+    display: block;      /* Supprime les espaces blancs autour de l'image */
+}
+
         
         /* Quand la sidebar est réduite */
         .main-content.expanded .header {
@@ -452,7 +474,9 @@
             <i class="fas fa-chevron-left"></i>
         </button></div>
     <a href="#" class="logo-container">
-        <div class="logo">A</div>
+        <div class="logo-boutique">
+            <img src="{{ asset('images/logo2.png') }}" alt="Logo de la boutique" class="h-12 w-auto">
+        </div>
         <div class="logo-text">Aku<span>esleystore</span></div>
     </a>
 
@@ -506,7 +530,7 @@
                 </div>
                 
                 <div class="dropdown-menu">
-                    <a href="{{route('profile.edit')}}" class="dropdown-item">
+                    <a href="{{ route('client.settings') }}" class="dropdown-item">
                         <i class="fas fa-user"></i>
                         <span>Voir le profil</span>
                     </a>

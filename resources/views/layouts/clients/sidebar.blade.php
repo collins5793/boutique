@@ -1,6 +1,7 @@
 @php
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
+use App\Models\CartItem;
 
 $user = Auth::user();
 
@@ -11,6 +12,10 @@ $pendingCount = Order::where('user_id', $user->id)
 $processingCount = Order::where('user_id', $user->id)
                         ->where('order_status', 'processing')
                         ->count();
+
+
+    $cartCount = CartItem::where('user_id', $user->id)->sum('quantity');
+
 @endphp
 
 {{-- <div class="row mb-4">
@@ -34,7 +39,7 @@ $processingCount = Order::where('user_id', $user->id)
 </div> --}}
 <div class="sidebar" id="sidebar">
     <div class="logo-container">
-        <div class="logo">B</div>
+        <div class="logo">A</div>
         <div class="logo-text">Boutique</div>
         
 
@@ -45,45 +50,43 @@ $processingCount = Order::where('user_id', $user->id)
         <div class="menu-section">
             <div class="section-label">Principal</div>
             <ul class="menu">
-                <li class="menu-item active">
-                    <div class="menu-icon"><i class="fas fa-home"></i></div>
-                    <div class="menu-text">Dashboard</div>
-                    <div class="tooltip">Dashboard</div>
+                <li class="menu-item {{ request()->routeIs('client.dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('client.dashboard') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <div class="menu-text">Dashboard</div>
+                        <div class="tooltip">Dashboard</div>
+                    </a>
                 </li>
-                <li class="menu-item">
-                    <div class="menu-icon"><i class="fas fa-box"></i></div>
-                                                            <a href="{{route('client.shop')}}">
-
-                    <div class="menu-text">Produits</div></a>
-                    <div class="tooltip">Produits</div>
+                <li class="menu-item {{ request()->routeIs('client.shop') ? 'active' : '' }}">
+                    <a href="{{ route('client.shop') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-box"></i></div>
+                        <div class="menu-text">Produits</div>
+                        <div class="tooltip">Produits</div>
+                    </a>
                 </li>
-                <li class="menu-item">
-                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
-                                        <a href="{{route('client.orders')}}">
-
-                    <div class="menu-text">Commandes</div>                    </a>
-
-                    <div class="badge">{{ $pendingCount }}</div>
-                    <div class="badgep">{{ $processingCount }}</div>
-                    <div class="tooltip">Commandes</div>
+               <li class="menu-item {{ request()->routeIs('client.orders') ? 'active' : '' }}">
+                    <a href="{{ route('client.orders') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="menu-text">Commandes</div>
+                        <div class="badge" id="pendingCount">0</div>
+                        <div class="badgep" id="processingCount">0</div>
+                        <div class="tooltip">Commandes</div>
+                    </a>
                 </li>
-                <li class="menu-item">
-                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
-                                        <a href="{{route('client.panier')}}">
-
-                    <div class="menu-text">Panier</div>                    </a>
-
-                    <div class="badge">{{ $pendingCount }}</div>
-                    <div class="badgep">{{ $processingCount }}</div>
-                    <div class="tooltip">Panier</div>
+                <li class="menu-item {{ request()->routeIs('client.panier') ? 'active' : '' }}">
+                    <a href="{{ route('client.panier') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="menu-text">Panier</div>
+                        <div class="badge" id="cartCount">0</div>
+                        <div class="tooltip">Panier</div>
+                    </a>
                 </li>
-                <li class="menu-item">
-                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
-                                                            <a href="{{route('client.loyalty.index')}}">
-
-                    <div class="menu-text">Fidélité & Récompenses</div></a>
-                    <div class="badge">3</div>
-                    <div class="tooltip">Fidélité & Récompenses</div>
+                <li class="menu-item {{ request()->routeIs('client.loyalty.index') ? 'active' : '' }}">
+                    <a href="{{ route('client.loyalty.index') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="menu-text">Fidélité & Récompenses</div>
+                        <div class="tooltip">Fidélité & Récompenses</div>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -92,17 +95,19 @@ $processingCount = Order::where('user_id', $user->id)
         <div class="menu-section">
             <div class="section-label">Préférences</div>
             <ul class="menu">
-                <li class="menu-item">
-                    <div class="menu-icon"><i class="fas fa-cog"></i></div>
-                    <div class="menu-text">Paramètres</div>
-                    <div class="tooltip">Paramètres</div>
+                <li class="menu-item {{ request()->routeIs('client.settings') ? 'active' : '' }}">
+                    <a href="{{ route('client.settings') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-cog"></i></div>
+                        <div class="menu-text">Paramètres</div>
+                        <div class="tooltip">Paramètres</div>
+                    </a>
                 </li>
-                <li class="menu-item">
-                    <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
-                                                            <a href="{{route('support')}}">
-
-                    <div class="menu-text">Support</div></a>
-                    <div class="tooltip">Support</div>
+                <li class="menu-item {{ request()->routeIs('client.support') ? 'active' : '' }}">
+                    <a href="{{ route('client.support') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
+                        <div class="menu-text">Support</div>
+                        <div class="tooltip">Support</div>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -286,6 +291,15 @@ $processingCount = Order::where('user_id', $user->id)
 
     .menu {
         list-style: none;
+    }
+     .menu-link {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: background .2s ease;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
     }
 
     .menu-item {
@@ -891,3 +905,22 @@ $processingCount = Order::where('user_id', $user->id)
         border-radius: 4px;
     }
 </style>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateMenuCounts() {
+        $.get("{{ route('menu.counts') }}", function(data) {
+            $('#pendingCount').text(data.pending);
+            $('#processingCount').text(data.processing);
+            $('#cartCount').text(data.cart);
+        });
+    }
+
+    // Mise à jour initiale
+    updateMenuCounts();
+
+    // Actualisation toutes les 5 secondes (5000 ms)
+    setInterval(updateMenuCounts, 5000);
+</script>

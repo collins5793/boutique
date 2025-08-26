@@ -3,7 +3,6 @@
 @section('title', 'Mon Panier')
 
 @section('content')
-<div class="cart-container">
     <div class="cart-header">
         <h1 class="cart-title">VOTRE PANIER</h1>
         <div class="cart-progress">
@@ -35,7 +34,7 @@
             </div>
             <h2>Votre panier est vide</h2>
             <p>Parcourez nos produits et ajoutez des articles à votre panier</p>
-            <a href="{{ route('products.index') }}" class="btn btn-primary">Découvrir nos produits</a>
+            <a href="{{ route('client.shop') }}" class="btn btn-primary">Découvrir nos produits</a>
         </div>
     @else
     <div class="cart-grid">
@@ -109,7 +108,7 @@
 
                 <div class="summary-line">
                     <span>Sous-total ({{ $cartItems->count() }} article{{ $cartItems->count() > 1 ? 's' : '' }})</span>
-                    <span>{{ number_format($subtotal, 0, ',', ' ') }} FCFA</span>
+                    <span>{{ number_format($subtotale, 0, ',', ' ') }} FCFA</span>
                 </div>
 
                 <div class="summary-line discount">
@@ -119,14 +118,14 @@
 
                 <div class="summary-line">
                     <span>Frais de livraison</span>
-                    <span>13 FCFA</span>
+                    <span>------- FCFA</span>
                 </div>
 
                 <div class="summary-divider"></div>
 
                 <div class="summary-total">
                     <span>Total</span>
-                    <span>{{ number_format($subtotal + 13, 0, ',', ' ') }} FCFA</span>
+                    <span>{{ number_format($subtotal, 0, ',', ' ') }} FCFA</span>
                 </div>
                 
                 <div class="savings-notice">
@@ -208,7 +207,6 @@
         </div>
     </div>
     @endif
-</div>
 
 <style>
 :root {
