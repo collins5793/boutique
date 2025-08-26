@@ -58,6 +58,7 @@
     @endforeach
 </div>
 
+
 {{-- Modal 1 : Détails produit avec variantes --}}
 <div id="productModal" class="modal-custom">
     <div class="modal-content-custom">

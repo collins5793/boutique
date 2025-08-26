@@ -69,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/orders', [ClientDashboardController::class, 'order'])->name('client.orders');
     Route::get('/dashboard/panier', [ClientDashboardController::class, 'panier'])->name('client.panier');
+    Route::get('/dashboard/shop', [ClientDashboardController::class, 'shop'])->name('client.shop');
     Route::get('/dashboard/recompense', [LoyaltyPointController::class, 'index'])->name('client.loyalty.index');
     Route::get('/dashboard/orders/{id}', [ClientDashboardController::class, 'ordershow'])->name('client.ordershow');
 });

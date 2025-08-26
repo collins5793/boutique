@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\CartItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -195,4 +197,53 @@ public function panier()
                         ->get();
         return view('client.panier', compact('cartItems'));
     }
+
+public function shop(Request $request)
+{
+    $query = Product::with('variants', 'category')->where('status', 'active');
+
+    // Recherche
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where('name', 'like', "%$search%");
+    }
+
+    // Tri
+    if ($request->has('sort') && $request->sort != '') {
+        switch ($request->sort) {
+            case 'popularity':
+                $query->orderBy('rating', 'desc');
+                break;
+            case 'price_low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+    } else {
+        $query->latest();
+    }
+
+    $products = $query->paginate(12)->withQueryString(); // garde les filtres dans la pagination
+
+    $categories = Category::withCount([
+        'products as active_products_count' => function ($query) {
+            $query->where('status', 'active');
+        }
+    ])->with([
+        'subcategories.products' => function ($query) {
+            $query->where('status', 'active')->with('variants');
+        },
+        'products' => function ($query) {
+            $query->where('status', 'active')->with('variants');
+        }
+    ])->whereNull('parent_id')->get();
+
+    return view('client.shop', compact('products', 'categories'));
+}
+
 }
