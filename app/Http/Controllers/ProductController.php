@@ -140,9 +140,15 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Produit mis à jour avec succès');
     }
 
+
+
 public function getActiveProductsByCategory()
 {
-    $categories = Category::with([
+    $categories = Category::withCount([
+        'products as active_products_count' => function ($query) {
+            $query->where('status', 'active');
+        }
+    ])->with([
         'subcategories.products' => function ($query) {
             $query->where('status', 'active')->with('variants');
         },
@@ -153,7 +159,6 @@ public function getActiveProductsByCategory()
 
     return view('shop.products_by_category', compact('categories'));
 }
-
 
 
     public function destroy(Product $product)

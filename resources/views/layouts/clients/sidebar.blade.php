@@ -52,7 +52,9 @@ $processingCount = Order::where('user_id', $user->id)
                 </li>
                 <li class="menu-item">
                     <div class="menu-icon"><i class="fas fa-box"></i></div>
-                    <div class="menu-text">Produits</div>
+                                                            <a href="{{route('client.shop')}}">
+
+                    <div class="menu-text">Produits</div></a>
                     <div class="tooltip">Produits</div>
                 </li>
                 <li class="menu-item">
