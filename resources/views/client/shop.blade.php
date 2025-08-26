@@ -106,13 +106,15 @@
             <span class="current-price">{{ number_format($product->price, 0, ',', ' ') }} FCFA</span>
           @endif
         </div>
-      </div>
-      
-<button class="quick-add-btn" 
+        <button class="quick-add-btn" 
         data-product='@json($product)' 
         onclick="openQuantityModal(JSON.parse(this.dataset.product)); event.stopPropagation();">
-   🛒 Ajouter
+   <i class="fas fa-cart-plus"></i>
 </button>
+      </div>
+      
+
+
 
     </div>
     @endforeach
@@ -480,37 +482,130 @@
 
 /* Prix produit */
 .product-price {
-    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+    flex-wrap: wrap;
 }
 
 .current-price {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--primary-dark);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 4px rgba(245, 6, 196, 0.15);
 }
 
 .old-price {
     font-size: 0.9rem;
-    color: var(--dark-light);
+    color: var(--gray-400);
     text-decoration: line-through;
-    margin-left: 0.5rem;
+    font-weight: 500;
+    position: relative;
 }
 
-/* Bouton d'ajout */
+.old-price::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--danger), transparent);
+    transform: translateY(-50%);
+}
+
 .quick-add-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.8rem;
-    border-radius: 0 0 var(--radius) var(--radius);
-    font-weight: bold;
+    margin-left: auto;
+    background: #f8f8f8;
+    color: var(--primary);
+    border: solid 1px var(--primary);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: var(--transition);
-    margin-top: auto;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(245, 6, 196, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-add-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
 }
 
 .quick-add-btn:hover {
-    background: var(--primary-dark);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(245, 6, 196, 0.4);
+}
+
+.quick-add-btn:hover::before {
+    left: 100%;
+}
+
+.quick-add-btn:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 5px rgba(245, 6, 196, 0.3);
+}
+
+.quick-add-btn i {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.quick-add-btn:hover i {
+    transform: scale(1.2);
+}
+
+
+/* Animation pour l'ajout au panier */
+@keyframes addToCart {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.quick-add-btn.added {
+    animation: addToCart 0.5s ease;
+    background: linear-gradient(135deg, var(--success), #0d9d6e);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .product-price {
+        gap: 8px;
+    }
+    
+    .current-price {
+        font-size: 1.1rem;
+    }
+    
+    .old-price {
+        font-size: 0.85rem;
+    }
+    
+    .quick-add-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .quick-add-btn i {
+        font-size: 1rem;
+    }
 }
 
 /* Pagination */
