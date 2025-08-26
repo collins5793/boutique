@@ -226,6 +226,7 @@
         </div>
     </div>
 @yield('scripts')
+
     <script>
         // Script pour gérer la communication entre les composants
         document.addEventListener('DOMContentLoaded', function() {

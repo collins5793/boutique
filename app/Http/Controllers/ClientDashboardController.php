@@ -208,27 +208,33 @@ public function shop(Request $request)
         $query->where('name', 'like', "%$search%");
     }
 
-    // Tri
+    // Tri / Filtrage
     if ($request->has('sort') && $request->sort != '') {
-        switch ($request->sort) {
-            case 'popularity':
-                $query->orderBy('rating', 'desc');
-                break;
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'newest':
-                $query->orderBy('created_at', 'desc');
-                break;
+        if (str_starts_with($request->sort, 'category_')) {
+            // Filtrer par catégorie
+            $categoryId = intval(str_replace('category_', '', $request->sort));
+            $query->where('category_id', $categoryId);
+        } else {
+            switch ($request->sort) {
+                case 'popularity':
+                    $query->orderBy('rating', 'desc');
+                    break;
+                case 'price_low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
         }
     } else {
         $query->latest();
     }
 
-    $products = $query->paginate(12)->withQueryString(); // garde les filtres dans la pagination
+    $products = $query->paginate(12)->withQueryString();
 
     $categories = Category::withCount([
         'products as active_products_count' => function ($query) {
@@ -245,5 +251,26 @@ public function shop(Request $request)
 
     return view('client.shop', compact('products', 'categories'));
 }
+
+public function counts()
+    {
+        $user = Auth::user();
+
+        $pendingCount = Order::where('user_id', $user->id)
+                             ->where('order_status', 'pending')
+                             ->count();
+
+        $processingCount = Order::where('user_id', $user->id)
+                                ->where('order_status', 'processing')
+                                ->count();
+
+        $cartCount = CartItem::where('user_id', $user->id)->sum('quantity');
+
+        return response()->json([
+            'pending' => $pendingCount,
+            'processing' => $processingCount,
+            'cart' => $cartCount
+        ]);
+    }
 
 }

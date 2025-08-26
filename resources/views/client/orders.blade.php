@@ -26,11 +26,6 @@
 }
 
 /* ----------- STYLES DE BASE ----------- */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem;
-}
 
 /* ----------- TITRE ----------- */
 h2 {
@@ -42,7 +37,214 @@ h2 {
     border-bottom: 2px solid var(--primary-light);
 }
 
+
 /* ----------- STATISTIQUES ----------- */
+
+      
+
+       
+
+        .stat-label {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+       
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+         .stats-container {
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, .5fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:nth-child(2) {
+            border-top-color: var(--secondary);
+        }
+
+        .stat-card:nth-child(3) {
+            border-top-color: var(--accent);
+        }
+
+        .stat-card:nth-child(4) {
+            border-top-color: #14c9c9;
+        }
+
+        .stat-card:nth-child(5) {
+            border-top-color: #14c923;
+        }
+
+        .stat-card:nth-child(6) {
+            border-top-color: #c91414;
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 50%;
+            background-color: rgba(245, 6, 196, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background-color: rgba(0, 123, 255, 0.1);
+            color: var(--secondary);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background-color: rgba(255, 123, 0, 0.1);
+            color: var(--accent);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-card:nth-child(5) .stat-icon {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-card:nth-child(6) .stat-icon {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray-500);
+            font-weight: 500;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .stats-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        /* Animation d'apparition */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .stat-card:nth-child(5) { animation-delay: 0.5s; }
+        .stat-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 20px 15px;
+            }
+            
+            .stat-value {
+                font-size: 22px;
+            }
+            
+            .stat-icon {
+                font-size: 22px;
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+            }
+        }
+
+        @media (max-width: 580px) {
+            .stats-card {
+                card-template-columns: repeat(1);
+            }
+        }
+
 .row {
     display: flex;
     flex-wrap: wrap;
@@ -81,7 +283,7 @@ h2 {
     display: block;
 }
 
-.badge {
+.badgee {
     display: inline-block;
     padding: 0.5rem 1rem;
     border-radius: 50px;
@@ -368,7 +570,7 @@ td {
         padding: 0.75rem 0.5rem;
     }
     
-    .badge {
+    .badgee {
         font-size: 0.9rem;
         padding: 0.4rem 0.8rem;
     }
@@ -415,21 +617,33 @@ td {
     color: var(--dark-light);
 }
 </style>
-<div class="container">
 
     {{-- Statistiques --}}
-    <h2 class="mb-4">🛍 Mes commndes</h2>
-    <div class="row mb-4">
-        @foreach($stats as $key => $value)
-            <div class="col-md-2">
-                <div class="card text-center shadow-sm">
-                    <div class="card-body">
-                        <h6 class="text-muted">{{ ucfirst($key) }}</h6>
-                        <span class="badge bg-primary fs-6">{{ $value }}</span>
-                    </div>
+    <div class="stats-container">
+        <h2 class="stats-title">Aperçu des Statistiques</h2>
+        <div class="stats-grid">
+            @foreach($stats as $key => $value)
+            <div class="stat-card">
+                <div class="stat-icon">
+                    @if(ucfirst($key) == 'Total')
+                    📦
+                    @elseif(ucfirst($key) == 'Pending')
+                    ⏳
+                    @elseif(ucfirst($key) == 'Processing')
+                    🔄
+                    @elseif(ucfirst($key) == 'Shipped')
+                    🚚
+                    @elseif(ucfirst($key) == 'Delivered')
+                    ✅
+                    @else
+                    📊
+                    @endif
                 </div>
+                <div class="stat-label">{{ ucfirst($key) }}</div>
+                <div class="stat-value">{{ $value }}</div>
             </div>
-        @endforeach
+            @endforeach
+        </div>
     </div>
 
     {{-- Filtres --}}
@@ -467,44 +681,49 @@ td {
                         <th>Total</th>
                         <th>Statut</th>
                         <th>Paiement</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($orders as $order)
-                        <tr>
+                        <tr style="cursor:pointer;" onclick="window.location='{{ route('client.ordershow', $order->id) }}'">
                             <td>{{ $order->order_number }}</td>
                             <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                             <td>{{ number_format($order->total_amount, 0, ',', ' ') }} CFA</td>
                             <td>
-                                <span class="badge bg-{{ $order->order_status == 'pending' ? 'warning' :
-                                                         ($order->order_status == 'processing' ? 'info' :
-                                                         ($order->order_status == 'shipped' ? 'primary' :
-                                                         ($order->order_status == 'delivered' ? 'success' : 'danger'))) }}">
+                                <span class="badgee bg-{{ $order->order_status == 'pending' ? 'warning' :
+                                                        ($order->order_status == 'processing' ? 'info' :
+                                                        ($order->order_status == 'shipped' ? 'primary' :
+                                                        ($order->order_status == 'delivered' ? 'success' : 'danger'))) }}">
                                     {{ ucfirst($order->order_status) }}
                                 </span>
                             </td>
                             <td>{{ ucfirst(str_replace('_', ' ', $order->payment_method)) }}</td>
-                            <td>
-                                <td>
-                                    <a href="{{ route('client.ordershow', $order->id) }}" class="btn btn-sm btn-outline-primary">
-                                        🔍 Voir détail
-                                    </a>
-                                </td>
-                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-center">Aucune commande trouvée</td></tr>
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune commande trouvée</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
-
-            
         </div>
     </div>
-</div>
-
-
+ <script>
+        // Animation pour faire apparaître les barres de progression
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            
+            // Réinitialiser la largeur pour l'animation
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+        });
+    </script>
 
 <script>
 function showOrder(id) {
