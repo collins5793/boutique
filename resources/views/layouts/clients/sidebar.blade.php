@@ -18,6 +18,13 @@ $processingCount = Order::where('user_id', $user->id)
 
 @endphp
 
+@php
+    $unreadCount = \App\Models\Notification::where('user_id', Auth::id())
+        ->whereNull('read_at')
+        ->count();
+@endphp
+
+
 {{-- <div class="row mb-4">
     <div class="col-md-3">
         <div class="card text-center shadow-sm">
@@ -88,6 +95,22 @@ $processingCount = Order::where('user_id', $user->id)
                         <div class="tooltip">Fidélité & Récompenses</div>
                     </a>
                 </li>
+                <li class="menu-item {{ request()->routeIs('messages.index', ['receiver_id' => 1]) ? 'active' : '' }}">
+                    <a href="{{ route('messages.index', ['receiver_id' => 1]) }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-bell"></i></div>
+                        <div class="menu-text">Messages</div>
+                        <div class="tooltip">Messages</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('notifications.index') ? 'active' : '' }}">
+                    <a href="{{ route('notifications.index') }}" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-bell"></i></div>
+                        <div class="menu-text">Notifications</div>
+@if($unreadCount > 0)
+                        <div class="badge" id="cartCount">+</div>
+            @endif                        <div class="tooltip">Notifications</div>
+                    </a>
+                </li>
             </ul>
         </div>
         
@@ -111,6 +134,59 @@ $processingCount = Order::where('user_id', $user->id)
                 </li>
             </ul>
         </div>
+
+        <div class="user-profile" id="userProfile">
+            <div class="user-avatar">
+                {{ strtoupper(substr(Auth::user()->email ?? '', 0, 1)) }}
+                <span class="user-status"></span>
+            </div>
+
+            <div class="user-info">
+                <div class="user-name">{{ Auth::user()->name ?? 'Client' }}</div>
+                <div class="user-role">{{ Auth::user()->email ?? '' }}</div>
+            </div>
+        </div>
+
+
+        <!-- Menu déroulant du profil -->
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-header">
+                    <div class="user-avatar">
+                        {{ strtoupper(substr(Auth::user()->email ?? '', 0, 1)) }}
+                        <span class="user-status"></span>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">{{ Auth::user()->name ?? 'Client' }}</div>
+                        <div class="user-role">{{ Auth::user()->email ?? '' }}</div>
+                    </div>
+                </div>
+                
+                <div class="dropdown-menu">
+                    <a href="{{ route('client.settings') }}" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Voir le profil</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    
+                    <form method="POST" action="{{ route('logout') }}" class="dropdown-item" id="logoutBtn">
+                            @csrf
+
+                            <a href="{{route('logout')}}"
+                                    onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Se déconnecter</span>
+                            </a>
+                    </form>
+                </div>
+                
+                <div class="dropdown-footer">
+                    Version 2.4.1 • © 2023 Akuesleystore
+                </div>
+            </div>
+            
+            <!-- Overlay pour fermer le menu -->
+            <div class="dropdown-overlay" id="dropdownOverlay"></div>
     </div>
 </div>
 
@@ -180,7 +256,7 @@ $processingCount = Order::where('user_id', $user->id)
         width: var(--sidebar-width);
         background: linear-gradient(to bottom, var(--dark), var(--dark-light));
         color: #fff;
-        height: 100vh;
+        height: 100%;
         position: fixed;
         top: 0;
         left: 0;
@@ -825,9 +901,33 @@ $processingCount = Order::where('user_id', $user->id)
 
     /* Mobile responsiveness */
     @media (max-width: 1024px) {
-        .sidebar {
-            width: var(--sidebar-collapsed);
-        }
+        @media (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;   /* ✅ totalement hors écran par défaut */
+        width: var(--sidebar-width);
+        height: 100%;
+        transition: var(--transition);
+        z-index: 1000;
+    }
+
+    .sidebar.mobile-open {
+        left: 0;   /* ✅ revient à l’écran quand on clique sur le bouton */
+    }
+
+    /* Mobile menu button visible */
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+    /* Contenu prend toute la largeur */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}
+
         
         .sidebar.mobile-open {
             transform: translateX(0);
