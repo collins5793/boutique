@@ -61,7 +61,6 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 14px;
             text-decoration: none;
             transition: var(--transition);
         }
@@ -379,97 +378,99 @@
             z-index: 999;
             display: none;
         }
-        
-        /* Mobile responsiveness */
-        @media (max-width: 1024px) {
-            .search-box {
-                width: 350px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .toggle-btn {
-                /* display: none */
-            }
-            .header {
-                padding: 0 20px;
-                height: 70px;
-            }
-            
-            .logo-text {
-                font-size: 1.4rem;
-            }
-            
-            .search-box {
-                width: 45px;
-                overflow: hidden;
-                transition: var(--transition);
-                padding: 0;
-                justify-content: center;
-                cursor: pointer;
-            }
-            
-            .search-box.expanded {
-                width: 250px;
-                padding: 0 20px;
-                justify-content: flex-start;
-            }
-            
-            .search-box.expanded .search-categories,
-            .search-box.expanded input {
-                display: flex;
-            }
-            
-            .search-box i {
-                margin-right: 0;
-            }
-            
-            .search-categories,
-            .search-box input {
-                display: none;
-            }
-            
-            .search-box.expanded i {
-                margin-right: 14px;
-            }
-            
-            .user-info {
-                display: none;
-            }
-            
-            .profile-dropdown {
-                width: 250px;
-                right: -10px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .header {
-                padding: 0 15px;
-            }
-            
-            .logo-text {
-                display: ;
-            }
-            
-            .search-box.expanded {
-                width: 200px;
-            }
-            
-            .action-btn {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .user-avatar {
-                width: 40px;
-                height: 40px;
-            }
-        }
+     /* --- RESPONSIVE --- */
+
+/* Tablette */
+@media (max-width: 1024px) {
+    .toggle-btn {
+        display: none !important; /* pas de bouton de réduction sur mobile/tablette */
+    }
+
+    .logo-container {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .header {
+        justify-content: space-between;
+        padding: 0 15px;
+    }
+
+    .search-box {
+        width: 300px;
+    }
+}
+
+/* Téléphone */
+@media (max-width: 768px) {
+    /* On cache totalement la recherche */
+    .search-box {
+        display: none !important;
+    }
+
+    .header {
+        padding: 0 15px;
+        height: 65px;
+    }
+
+    .logo-text {
+        font-size: 1.2rem;
+    }
+
+    .header-actions {
+        gap: 12px;
+    }
+
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .user-info {
+        display: none; /* on masque nom + email pour garder un header clean */
+    }
+
+    .profile-dropdown {
+        width: 230px;
+        right: -10px;
+    }
+}
+
+/* Très petit téléphone */
+@media (max-width: 576px) {
+    .header {
+        padding: 0 10px;
+    }
+
+    .logo-boutique img {
+        height: 55px;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+}
+
     </style>
 </head>
 <body>
     <div class="header">
+        
     <div class="logo-container"><button class="toggle-btn" id="toggleSidebar">
             <i class="fas fa-chevron-left"></i>
         </button></div>

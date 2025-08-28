@@ -29,7 +29,6 @@ class ClientDashboardController extends Controller
         // Total dépensé (livrées + cash_on_delivery)
         $totalSpent = DB::table('orders')
             ->where('user_id', $user->id)
-            ->where('payment_method', 'cash_on_delivery')
             ->where('order_status', 'delivered')
             ->sum('total_amount');
 
