@@ -520,7 +520,7 @@
 
     <div class="search-box" id="searchBox">
         <i class="fas fa-search"></i>
-        <input type="text" placeholder="Rechercher produits, commandes, clients...">
+        <input type="text" placeholder="Rechercher produits, commandes, livreurs...">
         <div class="search-categories">
             <span>Tout</span>
             <i class="fas fa-chevron-down"></i>
@@ -548,7 +548,7 @@
             </div>
 
             <div class="user-info">
-                <div class="user-name">{{ Auth::user()->name ?? 'Client' }}</div>
+                <div class="user-name">{{ Auth::user()->name ?? 'livreur' }}</div>
                 <div class="user-role">{{ Auth::user()->email ?? '' }}</div>
             </div>
         </div>
@@ -562,13 +562,13 @@
                         <span class="user-status"></span>
                     </div>
                     <div class="user-info">
-                        <div class="user-name">{{ Auth::user()->name ?? 'Client' }}</div>
+                        <div class="user-name">{{ Auth::user()->name ?? 'livreur' }}</div>
                         <div class="user-role">{{ Auth::user()->email ?? '' }}</div>
                     </div>
                 </div>
                 
                 <div class="user-menu">
-                    <a href="{{ route('client.settings') }}" class="menu-item">
+                    <a href="{{ route('livreur.settings') }}" class="menu-item">
                         <i class="fas fa-user"></i>
                         <span>Voir le profil</span>
                     </a>
