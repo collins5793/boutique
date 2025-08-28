@@ -69,6 +69,16 @@
                 </li>
             </ul>
         </div>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Alex Dupont</div>
+                    <div class="user-role">Administrateur</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

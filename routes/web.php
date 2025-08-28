@@ -16,6 +16,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoyaltyPointController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ClientDashboardController;
+use App\Http\Controllers\AdminDashboardController;
 
 
 
@@ -61,7 +63,6 @@ Route::get('/dashboard/support', function () {
     return view('client/support');
 })->middleware(['auth', 'verified'])->name('client.support');
 
-use App\Http\Controllers\ClientDashboardController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
@@ -156,6 +157,13 @@ Route::prefix('livreur')->middleware(['auth'])->group(function () {
     Route::post('/support/ticket', [DeliveryController::class, 'createSupportTicket'])->name('livreur.support.ticket');
     Route::get('/support/faq', [DeliveryController::class, 'faq'])->name('livreur.faq');
 });
+
+
+
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+    ->name('admin.dashboard');
+
+
 
 
 Route::prefix('messages')->middleware('auth')->group(function () {
