@@ -8,12 +8,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #f506c4;
-            --primary-light: #ff33d1;
-            --primary-dark: #c0049b;
-            --secondary: #007bff;
-            --accent: #ff7b00;
+            --primary: #7c3aed;
+            --primary-light: #8b5cf6;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --dark-light: #334155;
             --light: #ffffff;
             --sidebar-width: 280px;
