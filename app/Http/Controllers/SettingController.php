@@ -2,64 +2,129 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Setting;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
 
 class SettingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $user = Auth::user();
+        return view('client.settings', compact('user'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // Mettre à jour profil
+    public function updateProfile(Request $request)
     {
-        //
+        $user = Auth::user();
+        $request->validate([
+            'name' => 'required|string|max:191',
+            'email' => 'required|email|max:191|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update($request->only('name','email','phone'));
+
+        if ($request->hasFile('profile_photo')) {
+            $path = $request->file('profile_photo')->store('profile_photos','public');
+            $user->profile_photo = $path;
+            $user->save();
+        }
+
+        return back()->with('success', 'Profil mis à jour avec succès.');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // Mettre à jour mot de passe
+    public function updatePassword(Request $request)
     {
-        //
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Mot de passe mis à jour avec succès.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Setting $setting)
+    // Mettre à jour préférences (exemple)
+    public function updatePreferences(Request $request)
     {
-        //
+        $user = Auth::user();
+        $user->update([
+            'language' => $request->language ?? 'fr',
+            // ajouter d'autres préférences ici
+        ]);
+
+        return back()->with('success', 'Préférences mises à jour.');
+    }
+    public function indexl()
+    {
+        $user = Auth::user();
+        return view('delivery.settings', compact('user'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Setting $setting)
+    // Mettre à jour profil
+    public function updateProfilel(Request $request)
     {
-        //
+        $user = Auth::user();
+        $request->validate([
+            'name' => 'required|string|max:191',
+            'email' => 'required|email|max:191|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update($request->only('name','email','phone'));
+
+        if ($request->hasFile('profile_photo')) {
+            $path = $request->file('profile_photo')->store('profile_photos','public');
+            $user->profile_photo = $path;
+            $user->save();
+        }
+
+        return back()->with('success', 'Profil mis à jour avec succès.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Setting $setting)
+    // Mettre à jour mot de passe
+    public function updatePasswordl(Request $request)
     {
-        //
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Mot de passe mis à jour avec succès.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Setting $setting)
+    // Mettre à jour préférences (exemple)
+    public function updatePreferencesl(Request $request)
     {
-        //
+        $user = Auth::user();
+        $user->update([
+            'language' => $request->language ?? 'fr',
+            // ajouter d'autres préférences ici
+        ]);
+
+        return back()->with('success', 'Préférences mises à jour.');
     }
 }

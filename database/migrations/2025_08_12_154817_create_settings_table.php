@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('key', 100)->unique();
             $table->text('value')->nullable();
             $table->text('description')->nullable();
+            $table->timestamps();
         });
     }
 

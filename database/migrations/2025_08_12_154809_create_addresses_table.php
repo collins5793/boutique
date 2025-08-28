@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('city', 100);
             $table->string('country', 100);
             $table->string('postal_code', 20)->nullable();
+            $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
