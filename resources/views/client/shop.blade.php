@@ -95,7 +95,6 @@
               <span class="star {{ $i <= $stars ? 'filled' : '' }}">★</span>
             @endfor
           </div>
-          <span class="rating-count">({{ $product->reviews_count }})</span>
         </div>
         
         <div class="product-price">
