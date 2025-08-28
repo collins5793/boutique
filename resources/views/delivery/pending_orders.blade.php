@@ -353,13 +353,7 @@
                                     <button class="btn btn-deliver start-delivery-btn" data-order-id="{{ $order->id }}">
                                         <i class="fas fa-truck"></i> Commencer la livraison
                                     </button>
-                                        <button class="btn btn-route view-route-btn"
-                                                data-lat="{{ $addr->latitude }}"
-                                                data-lng="{{ $addr->longitude }}"
-                                                data-order="{{ $order->order_number }}"
-                                                data-address="{{ $addr->full_address }}">
-                                            <i class="fas fa-route"></i> Voir l'itinéraire
-                                        </button>
+                                        
                                         @else
                                         <button class="btn btn-deliver start-delive-btn" data-order-id="{{ $order->id }}">
                                         <i class="fas fa-truck"></i> Commencer la livraison
@@ -375,17 +369,17 @@
     </div>
 
     {{-- Popup itinéraire --}}
-    <div id="routePopup" class="route-popup">
-        <div class="route-container">
-            <div class="route-header">
-                <div id="routeTitle" class="route-title"></div>
-                <button id="closeRoutePopup" class="close-route">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="routeMap"></div>
+    <div id="routePopup" class="route-popup" style="display:none;">
+    <div class="route-container">
+        <div class="route-header">
+            <div id="routeTitle" class="route-title"></div>
+            <button id="closeRoutePopup" class="close-route">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
+        <div id="routeMap" style="height:400px;"></div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -447,108 +441,95 @@
 
         // Popup Itinéraire
         const routePopup = document.getElementById('routePopup');
-        const closeRoute = document.getElementById('closeRoutePopup');
-        const routeMapId = 'routeMap';
-        const routeTitleEl = document.getElementById('routeTitle');
-        let routeMap = null;
-        let routingCtrl = null;
+    const closeRouteBtn = document.getElementById('closeRoutePopup');
+    const routeTitleEl = document.getElementById('routeTitle');
+    let routeMap = null;
+    let routingCtrl = null;
+    let watchId = null;
 
-        // Ouvrir le popup d'itinéraire
-        function openRoutePopup() {
-            routePopup.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Fermer le popup d'itinéraire
-        function closeRoutePopup() {
-            routePopup.style.display = 'none';
-            document.body.style.overflow = '';
-            if (routingCtrl) { routingCtrl.remove(); routingCtrl = null; }
-            if (routeMap) { routeMap.remove(); routeMap = null; }
-        }
+       function openRoutePopup() {
+        routePopup.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
 
-        closeRoute.addEventListener('click', closeRoutePopup);
+    function closeRoutePopup() {
+        routePopup.style.display = 'none';
+        document.body.style.overflow = '';
+        if (routingCtrl) { routingCtrl.remove(); routingCtrl = null; }
+        if (routeMap) { routeMap.remove(); routeMap = null; }
+        if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    }
 
-        // Bouton "Voir l'itinéraire"
-        document.querySelectorAll('.view-route-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const destLat = parseFloat(this.dataset.lat);
-                const destLng = parseFloat(this.dataset.lng);
-                const orderNo = this.dataset.order || '';
-                const destTxt = this.dataset.address || (destLat + ',' + destLng);
+    closeRouteBtn.addEventListener('click', closeRoutePopup);
 
-                if (!navigator.geolocation) {
-                    alert("La géolocalisation n'est pas supportée par votre navigateur.");
-                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}`, '_blank');
-                    return;
-                }
+    // --- Bouton voir itinéraire ---
+    document.querySelectorAll('.view-route-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const destLat = parseFloat(this.dataset.lat);
+            const destLng = parseFloat(this.dataset.lng);
+            const orderNo = this.dataset.order || '';
+            const destTxt = this.dataset.address || (destLat + ',' + destLng);
 
-                // Ouvrir le popup
-                openRoutePopup();
-                routeTitleEl.textContent = `Itinéraire — ${orderNo}`;
+            if (!navigator.geolocation) {
+                alert("La géolocalisation n'est pas supportée par votre navigateur.");
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}`, '_blank');
+                return;
+            }
 
-                // Initialiser la carte
-                routeMap = L.map(routeMapId).setView([destLat, destLng], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap contributors'
+            openRoutePopup();
+            routeTitleEl.textContent = `Itinéraire — ${orderNo}`;
+
+            // Init carte
+            routeMap = L.map('routeMap').setView([destLat, destLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(routeMap);
+
+            setTimeout(() => routeMap.invalidateSize(), 100);
+
+            const destMarker = L.marker([destLat, destLng]).addTo(routeMap).bindPopup(destTxt);
+            let startMarker = null;
+
+            // Mise à jour du trajet
+            function updateRoute(lat, lng) {
+                if (startMarker) startMarker.setLatLng([lat, lng]);
+                else startMarker = L.marker([lat, lng]).addTo(routeMap).bindPopup('Votre position');
+
+                if (routingCtrl) routingCtrl.remove();
+
+                routingCtrl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(lat, lng),
+                        L.latLng(destLat, destLng)
+                    ],
+                    router: L.Routing.osrmv1({
+                        serviceUrl: 'https://router.project-osrm.org/route/v1'
+                    }),
+                    lineOptions: { styles: [{ color: '#3388ff', opacity: 0.8, weight: 6 }] },
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: true,
+                    show: false
                 }).addTo(routeMap);
+            }
 
-                // Redimensionner la carte après l'affichage
-                setTimeout(() => routeMap.invalidateSize(), 100);
-
-                // Marqueur destination
-                const destMarker = L.marker([destLat, destLng]).addTo(routeMap).bindPopup(destTxt);
-
-                let startMarker = null;
-                let watchId = null;
-
-                // Fonction pour mettre à jour la position et recalculer la route
-                function updateRoute(lat, lng) {
-                    if (startMarker) startMarker.setLatLng([lat, lng]);
-                    else startMarker = L.marker([lat, lng]).addTo(routeMap).bindPopup('Votre position');
-
-                    if (routingCtrl) routingCtrl.remove();
-
-                    routingCtrl = L.Routing.control({
-                        waypoints: [
-                            L.latLng(lat, lng),
-                            L.latLng(destLat, destLng)
-                        ],
-                        router: L.Routing.osrmv1({
-                            serviceUrl: 'https://router.project-osrm.org/route/v1'
-                        }),
-                        lineOptions: { styles: [{ color: '#3388ff', opacity: 0.8, weight: 6 }] },
-                        addWaypoints: false,
-                        draggableWaypoints: false,
-                        fitSelectedRoutes: true,
-                        show: false
-                    }).addTo(routeMap);
-                }
-
-                // Suivi en temps réel
-                watchId = navigator.geolocation.watchPosition(pos => {
-                    updateRoute(pos.coords.latitude, pos.coords.longitude);
-                }, err => {
-                    alert("Erreur géolocalisation : " + err.message);
-                }, {
-                    enableHighAccuracy: true,
-                    maximumAge: 1000,
-                    timeout: 5000
-                });
-
-                // Arrêt du suivi quand on ferme le popup
-                closeRoute.addEventListener('click', function() {
-                    if (watchId) navigator.geolocation.clearWatch(watchId);
-                });
+            // Suivi en temps réel
+            watchId = navigator.geolocation.watchPosition(pos => {
+                updateRoute(pos.coords.latitude, pos.coords.longitude);
+            }, err => {
+                alert("Erreur géolocalisation : " + err.message);
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 1000,
+                timeout: 5000
             });
         });
+    });
 
-        // Fermer le popup en cliquant à l'extérieur
-        routePopup.addEventListener('click', function(e) {
-            if (e.target === routePopup) {
-                closeRoutePopup();
-            }
-        });
+    // Fermer en cliquant en dehors
+    routePopup.addEventListener('click', function(e) {
+        if (e.target === routePopup) closeRoutePopup();
+    });
     });
     </script>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Delivery;
+use App\Models\LoyaltyPoint;
 use App\Models\OrderItem;
 use App\Models\Notification;
 use App\Models\DeliveryAddress;
@@ -114,6 +115,23 @@ class DeliveryController extends Controller
         ]);
     }
 
+    public function cancel(Order $order)
+    {
+        $delivery = Delivery::where('order_id', $order->id)->firstOrFail();
+
+        // if($delivery->status === 'in_transit') {
+        //     return redirect()->back()->with('error', 'Impossible d’annuler : la commande est déjà en route.');
+        // }
+
+        $delivery->status = 'pending';
+        $delivery->save();
+
+        $order->order_status = 'pending';
+        $order->save();
+
+    return redirect()->route('delivery.pending')->with('success', 'Commande annulée avec succès !');
+    }
+
     public function FinDelivery(Order $order)
     {
         // Vérifier le paiement : si toujours pending → on le marque payé
@@ -213,14 +231,17 @@ Notification::create([
 
 public function valideDelivery(Order $order)
 {
-    // Vérifier si la commande a bien le statut "shipped"
+    // Vérifier si la commande est bien au statut "shipped"
     if ($order->order_status !== 'shipped') {
         return redirect()->back()->with('error', "Cette commande n'est pas encore validée par le livreur. ⏳");
     }
 
-    // Mettre à jour le statut de la commande en "delivered"
+    // Mettre à jour le statut de la commande
     $order->order_status = 'delivered';
     $order->save();
+
+    // Mettre à jour la livraison liée
+    $delivery = Delivery::where('order_id', $order->id)->first();
 
     // --- Attribution des points fidélité ---
     $total = $order->total_amount;
@@ -231,31 +252,38 @@ public function valideDelivery(Order $order)
         $points = floor($total / 1000);
 
         // Bonus si total >= 5000
-        if ($total >= 5000) {
-            $points += 1; // petit bonus
-        }
+        $points += 1;
     }
 
     if ($points > 0) {
-        \App\Models\LoyaltyPoint::create([
+        LoyaltyPoint::create([
             'user_id' => $order->user_id,
-            'points' => $points,
-            'reason' => "Commande #{$order->order_number} d’un montant de {$order->total_amount}F"
+            'points'  => $points,
+            'reason'  => "Commande #{$order->order_number} d’un montant de {$order->total_amount}F"
         ]);
     }
 
-    // Notification au client
+    // --- Notification au client ---
     Notification::create([
         'user_id' => $order->user_id,
-        'title' => "Commande livrée ✅",
+        'title'   => "Commande livrée ✅",
         'content' => "Votre commande {$order->order_number} a été confirmée comme livrée. 
                       Vous avez gagné {$points} points de fidélité 🎉",
-        'type' => 'system'
+        'type'    => 'system'
     ]);
 
-    return redirect()->back()->with('success', 'Livraison confirmée avec succès et points fidélité accordés !');
-}
+    // --- Notification au livreur ---
+    if ($delivery) {
+        Notification::create([
+            'user_id' => $delivery->delivery_person_id, // ID du livreur
+            'title'   => "Livraison confirmée 📦",
+            'content' => "La commande {$order->order_number} que vous avez livrée a bien été confirmée par le client ✅. Merci pour votre service 👏",
+            'type'    => 'system'
+        ]);
+    }
 
+    return redirect()->back()->with('success', 'Livraison confirmée avec succès ✅, points fidélité accordés et notifications envoyées !');
+}
 
 
     // Confirmation par le client
