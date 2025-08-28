@@ -271,6 +271,12 @@
                     <i class="fas fa-check-circle"></i> Livrer cette commande
                 </button>
             </form>
+            <form action="{{ route('delivery.cancel', $order->id) }}" method="POST" class="flex-fill">
+                @csrf
+                <button type="submit" class="btn btn-cancel">
+                    <i class="fas fa-times-circle"></i> Annuler la commande
+                </button>
+            </form>
         </div>
     </div>
 

@@ -138,6 +138,7 @@ Route::post('/delivery/start/{order}', [DeliveryController::class, 'startDeliver
 Route::post('/delive/start/{order}', [DeliveryController::class, 'startDelive'])->name('delive.start');
 Route::post('/delivery/fin/{order}', [DeliveryController::class, 'finDelivery'])->name('delivery.fin');
 Route::post('/delive/fin/{order}', [DeliveryController::class, 'finDelive'])->name('delive.fin');
+Route::post('/delivery/cancel/{order}', [DeliveryController::class, 'cancel'])->name('delivery.cancel');
 Route::post('/delivery/valide/{order}', [DeliveryController::class, 'valideDelivery'])->name('delivery.valide');
 Route::get('/delivery/tracking/{order}', [DeliveryController::class, 'tracking'])->name('delivery.tracking');
 Route::get('/delivery/tracki/{order}', [DeliveryController::class, 'tracki'])->name('delivery.tracki');

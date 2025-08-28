@@ -1102,16 +1102,15 @@ document.addEventListener("DOMContentLoaded", function() {
     function enregistrerAdresse(data){
         fetch("{{ route('addresses.store') }}", {
             method: 'POST',
-            headers: { 
-                'Content-Type':'application/json', 
-                'X-CSRF-TOKEN': '{{ csrf_token() }}' 
-            },
+            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             body: JSON.stringify(data)
         })
         .then(res => res.json())
         .then(resp => {
             if(resp.success){
+                selectedAddressId = resp.delivery_addresses_id; // ✅ stocker l'ID
                 hidePopup('manualAddressPopup');
+                hidePopup('addressChoicePopup');
                 showPopup('paymentChoicePopup');
             } else {
                 alert(resp.message || 'Erreur lors de l\'enregistrement de l\'adresse');
@@ -1122,15 +1121,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Boutons paiement
     document.getElementById('cashOnDeliveryBtn')?.addEventListener('click', () => {
-        passerCommande('cash_on_delivery');
+        passerCommande('cash_on_delivery', selectedAddressId);
     });
 
     document.getElementById('onlinePaymentBtn')?.addEventListener('click', () => {
-        passerCommande('mobile_money');
+        passerCommande('mobile_money', selectedAddressId);
     });
 
     // Passer la commande
-    function passerCommande(paymentMethod){
+    function passerCommande(paymentMethod, selectedAddressId){
+        if(!selectedAddressId){
+            alert("Veuillez choisir une adresse !");
+            return;
+        }
         fetch(`{{ route('orders.store') }}`, {
             method: 'POST',
             headers: {
@@ -1138,16 +1141,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ payment_method: paymentMethod })
+            body: JSON.stringify({ 
+                payment_method: paymentMethod, 
+                delivery_address_id: selectedAddressId // ✅ envoyé
+            })
         })
         .then(res => res.json())
         .then(data => {
             hidePopup('paymentChoicePopup');
             showNotification(data.message, data.success ? 'success' : 'error');
             if(data.success){
-                setTimeout(() => {
-                    window.location.href = '/mes-commandes';
-                }, 1500);
+                setTimeout(() => window.location.href = '/dashboard/orders', 1500);
             }
         })
         .catch(err => console.error("Erreur fetch:", err));

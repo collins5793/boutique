@@ -248,6 +248,45 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* Bouton d'annulation */
+.btn-cancel {
+    background-color: #ff4d4f; /* rouge vif */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* espace entre l'icône et le texte */
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-cancel i {
+    font-size: 1.1rem;
+}
+
+/* Hover effect */
+.btn-cancel:hover {
+    background-color: #d9363e; /* rouge un peu plus foncé */
+    transform: translateY(-2px);
+}
+
+/* Active / click effect */
+.btn-cancel:active {
+    transform: translateY(0);
+    background-color: #b82a2f;
+}
+
+/* Disabled state (optionnel si tu veux désactiver le bouton après clic) */
+.btn-cancel:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
     </style>
 </head>
 <body>
@@ -299,6 +338,12 @@
             @csrf
             <button type="submit" class="btn btn-deliver">
                 <i class="fas fa-check-circle"></i> Livrer cette commande
+            </button>
+        </form>
+        <form action="{{ route('delivery.cancel', $order->id) }}" method="POST" class="flex-fill">
+            @csrf
+            <button type="submit" class="btn btn-cancel">
+            <i class="fas fa-times-circle"></i> Annuler la commande
             </button>
         </form>
     </div>
