@@ -89,50 +89,7 @@
         @yield('content')
     </div>
 
-    <!-- Widget de chatbot flottant À GAUCHE - CORRIGÉ -->
-    <div id="chatbot-widget" class="fixed-bottom" style="bottom: 20px; left: 20px; pointer-events: none;">
-        <button id="chatbot-toggle" class="btn btn-primary rounded-circle" style="width: 60px; height: 60px; pointer-events: auto;">
-            <i class="fas fa-robot fa-lg"></i>
-        </button>
-        
-        <div id="chatbot-container" class="card d-none" style="width: 350px; position: absolute; bottom: 70px; left: 0; pointer-events: auto;">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <span class="fw-bold">Assistant Virtuel</span>
-                </div>
-                <button id="chatbot-close" class="btn btn-sm btn-link text-white p-0">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div id="chatbot-messages" class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
-                <div class="d-flex justify-content-start mb-2">
-                    <div class="chatbot-message chatbot-bot-message p-3">
-                        <p class="mb-0">Bonjour ! Comment puis-je vous aider aujourd'hui ?</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card-footer p-3">
-                <div class="input-group">
-                    <input 
-                        type="text" 
-                        id="chatbot-input" 
-                        placeholder="Tapez votre message..." 
-                        class="form-control"
-                        autocomplete="off"
-                    >
-                    <button id="chatbot-send" class="btn btn-primary">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+  
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

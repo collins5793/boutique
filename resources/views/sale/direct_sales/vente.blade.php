@@ -1,14 +1,12 @@
-@extends('layouts.clients.client')
+@extends('layouts.sales.sale')
 
 @section('title', 'Boutique')
 
 @section('content')
 
 <header class="shop-header">
-  <div class="banner">
-    <h1>🛍 Bienvenue dans notre Boutique</h1>
-    <p>Découvrez nos meilleures offres et nouveautés</p>
-  </div>
+  <div class="banner" id="banner"></div>
+
 
   <div class="filters-bar">
     <form id="searchForm" class="search-form" method="GET" action="{{ route('client.shop') }}">
@@ -112,6 +110,7 @@
             @else
                 <span class="current-price">{{ number_format($product->price, 0, ',', ' ') }} FCFA</span>
             @endif
+            <span>{{ number_format($product->stock_quantity, 0, ',', ' ') }} en stock</span>
 
             {{-- Réductions par quantité --}}
             @if($product->discounts->count() > 0)
@@ -147,6 +146,11 @@
       </div>
     @endif
   </main>
+</div>
+
+<!-- Zone qui sera remplacée dynamiquement -->
+<div id="cartContainer">
+    @include('sale.direct_sales.partials.cart_content')
 </div>
 
 {{-- Modal 1 : Détails produit avec variantes --}}
@@ -205,25 +209,7 @@
 
 <style>
 /* ----------- VARIABLES ----------- */
-:root {
-    --primary: #f506c4;
-    --primary-light: #ff33d1;
-    --primary-dark: #c0049b;
-    --secondary: #007bff;
-    --accent: #ff7b00;
-    --dark: #1e293b;
-    --dark-light: #334155;
-    --light: #ffffff;
-    --sidebar-width: 280px;
-    --sidebar-collapsed: 85px;
-    --header-height: 80px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --radius: 12px;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    --mobile-breakpoint: 1024px;
-    --tablet-breakpoint: 768px;
-    --phone-breakpoint: 576px;
-}
+
 
 /* ----------- STYLES DE BASE ----------- */
 .shop-header {
@@ -1459,6 +1445,7 @@ function showProductDetails(product) {
     document.getElementById('modalProductreduction').innerHTML = reductionHtml;
 
 
+
     // Galerie
     let gallery = [];
     try {
@@ -1509,6 +1496,17 @@ function showProductDetails(product) {
     currentSlide = 0;
     updateCarousel();
     document.getElementById('productModal').style.display = 'flex';
+}
+
+async function refreshCart() {
+    try {
+        let response = await fetch("/cart/data");
+        let html = await response.text();
+
+        document.getElementById("cartContainer").innerHTML = html;
+    } catch (error) {
+        console.error("Erreur lors du rafraîchissement du panier:", error);
+    }
 }
 
 function closeModal(modalId) { 
@@ -1678,6 +1676,7 @@ async function addToCart() {
 
         // Succès (200)
         alert(data.message || 'Produit ajouté au panier.');
+        refreshCart();
         closeModal('quantityModal');
 
         // Mettre à jour compteur / mini-cart si fonction dispo
@@ -1722,4 +1721,31 @@ function applySorting() {
     window.location.href = url.toString();
 }
 </script>
+
+<script>
+    async function checkCart() {
+        try {
+            const response = await fetch('/cart/status');
+            const data = await response.json();
+
+            const banner = document.getElementById('banner');
+
+            if (data.isEmpty) {
+                banner.innerHTML = "<p>Panier vide</p>";
+            } else {
+                banner.innerHTML = "<br><br><br><br><br><br><br>";
+            }
+        } catch (error) {
+            console.error("Erreur en vérifiant le panier :", error);
+        }
+    }
+
+    // Vérifier le panier toutes les 1 seconde
+    setInterval(checkCart, 1000);
+
+    // Vérifier immédiatement au chargement
+    checkCart();
+</script>
 @endsection
+
+

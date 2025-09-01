@@ -8,9 +8,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #f506c4;
-            --primary-light: #ff33d1;
-            --primary-dark: #c0049b;
+            --primary: #eb770a;
+            --primary-light: #ec8a2f;
+            --primary-dark: #be6109;
             --secondary: #007bff;
             --accent: #ff7b00;
             --dark: #1e293b;
@@ -168,11 +168,11 @@
 <body>
     <div class="dashboard-container">
         {{-- Sidebar --}}
-        @include('layouts.admins.sidebar')
+        @include('layouts.sales.sidebar')
         
         <div class="main-content" id="mainContent">
             {{-- Header --}}
-            @include('layouts.admins.header')
+            @include('layouts.sales.header')
             
             {{-- Section personnalisée --}}
             <div class="dashboard-content">
