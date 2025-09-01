@@ -1,13 +1,12 @@
 @extends('layouts.apli')
 
-
 @section('title', 'Ajouter un produit')
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Ajouter un produit</h1>
+    <h1 class="mb-4">{{ isset($product) ? 'Modifier le produit' : 'Ajouter un produit' }}</h1>
 
-    <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ isset($product) ? route('products.update', $product) : route('products.store') }}" enctype="multipart/form-data">
         @csrf
         @if(isset($product)) @method('PUT') @endif
 
@@ -23,8 +22,7 @@
                     <label for="category_id" class="form-label">Catégorie *</label>
                     <select class="form-select" id="category_id" name="category_id" required>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}"
-                                {{ (isset($product) && $product->category_id == $category->id) ? 'selected' : '' }}>
+                            <option value="{{ $category->id }}" {{ (isset($product) && $product->category_id == $category->id) ? 'selected' : '' }}>
                                 {{ $category->name }}
                             </option>
                         @endforeach
@@ -59,25 +57,23 @@
         </div>
 
         <div class="row">
-
             <div class="col-md-6">
-                <div class="mb-3">
-                    <label class="form-label">Statut *</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="status" id="status_active" value="active"
-                            {{ (isset($product) && $product->status == 'active') ? 'checked' : (old('status', 'active') == 'active' ? 'checked' : '') }}>
-                        <label class="form-check-label" for="status_active">Actif</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="status" id="status_inactive" value="inactive"
-                            {{ (isset($product) && $product->status == 'inactive') ? 'checked' : (old('status') == 'inactive' ? 'checked' : '') }}>
-                        <label class="form-check-label" for="status_inactive">Inactif</label>
-                    </div>
+                <label class="form-label">Statut *</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="status" id="status_active" value="active"
+                        {{ (isset($product) && $product->status == 'active') ? 'checked' : (old('status', 'active') == 'active' ? 'checked' : '') }}>
+                    <label class="form-check-label" for="status_active">Actif</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="status" id="status_inactive" value="inactive"
+                        {{ (isset($product) && $product->status == 'inactive') ? 'checked' : (old('status') == 'inactive' ? 'checked' : '') }}>
+                    <label class="form-check-label" for="status_inactive">Inactif</label>
                 </div>
             </div>
         </div>
 
-        <div class="row">
+        <!-- Image principale -->
+        <div class="row mt-3">
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="image" class="form-label">Image principale</label>
@@ -116,13 +112,33 @@
             </div>
         </div>
 
+        <!-- Réductions dynamiques -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <h4>Réductions (optionnel)</h4>
+                <button type="button" class="btn btn-sm btn-success mb-2" onclick="addDiscountRow()">Ajouter une réduction</button>
+                <div id="discounts_container">
+                    @if(!empty($discounts))
+    @foreach($discounts as $d)
+        <div class="discount-row mb-2 row" data-index="0">
+            <div class="col-md-5">
+                <input type="number" min="1" class="form-control" 
+                    name="discounts[0][min_quantity]" placeholder="Quantité min">
+            </div>
+            <div class="col-md-5">
+                <input type="number" min="0" step="0.01" class="form-control" 
+                    name="discounts[0][price]" placeholder="Prix réduit">
+            </div>
+        </div>
+    @endforeach
+@endif
+                </div>
+            </div>
+        </div>
+
         <div class="d-flex justify-content-between mt-4">
-            <a href="{{ route('products.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Retour
-            </a>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Enregistrer
-            </button>
+            <a href="{{ route('products.index') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
         </div>
     </form>
 </div>
@@ -130,15 +146,36 @@
 @push('scripts')
 <script>
 function removeGalleryImage(button, imagePath) {
-    // Ajouter l'image à supprimer dans le champ caché
     const hiddenField = document.getElementById('removed_gallery_images');
     let removedImages = hiddenField.value ? hiddenField.value.split(',') : [];
     removedImages.push(imagePath);
     hiddenField.value = removedImages.join(',');
-
-    // Supprimer l'élément visuel
     button.closest('.col-3').remove();
+}
+
+// Ajouter une ligne de réduction
+let discountIndex = {{ count($discounts ?? []) }};
+
+function addDiscountRow() {
+    const container = document.getElementById('discounts_container');
+    const row = document.createElement('div');
+    row.classList.add('discount-row', 'mb-2', 'row');
+    row.setAttribute('data-index', discountIndex);
+    row.innerHTML = `
+        <div class="col-md-5">
+            <input type="number" min="1" class="form-control" name="discounts[${discountIndex}][min_quantity]" placeholder="Quantité min">
+        </div>
+        <div class="col-md-5">
+            <input type="number" min="0" step="0.01" class="form-control" name="discounts[${discountIndex}][price]" placeholder="Prix réduit">
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger" onclick="this.closest('.discount-row').remove()">Supprimer</button>
+        </div>
+    `;
+    container.appendChild(row);
+    discountIndex++;
 }
 </script>
 @endpush
+
 @endsection

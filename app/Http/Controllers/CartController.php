@@ -18,6 +18,7 @@ class CartController extends Controller
                         ->get();
         return view('shop.cart', compact('cartItems'));
     }
+ 
 
     // Ajouter un produit au panier
     public function add(Request $request)

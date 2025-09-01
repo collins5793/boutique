@@ -1022,5 +1022,5 @@ $processingCount = Order::where('user_id', $user->id)
     updateMenuCounts();
 
     // Actualisation toutes les 5 secondes (5000 ms)
-    setInterval(updateMenuCounts, 5000);
+    setInterval(updateMenuCounts, 1000);
 </script>

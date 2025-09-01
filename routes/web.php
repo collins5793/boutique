@@ -17,7 +17,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoyaltyPointController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ClientDashboardController;
-use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\SaleDashboardController;
+use App\Http\Controllers\DirectSaleController;
+use App\Http\Controllers\DirectSaleCartController;
 
 
 
@@ -87,6 +89,12 @@ Route::prefix('dashboard')->middleware('auth')->group(function () {
     Route::post('settings/password', [SettingController::class, 'updatePassword'])->name('client.settings.password');
     Route::post('settings/preferences', [SettingController::class, 'updatePreferences'])->name('client.settings.preferences');
 });
+Route::prefix('sales')->middleware('auth')->group(function () {
+    Route::get('settings', [SettingController::class, 'indexs'])->name('sale.settings');
+    Route::post('settings/profile', [SettingController::class, 'updateProfiles'])->name('sale.settings.profile');
+    Route::post('settings/password', [SettingController::class, 'updatePasswords'])->name('sale.settings.password');
+    Route::post('settings/preferences', [SettingController::class, 'updatePreferencess'])->name('sale.settings.preferences');
+});
 
 
 
@@ -113,6 +121,11 @@ Route::middleware(['auth'])->group(function() {
     Route::put('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart/data', [DirectSaleController::class, 'getData']);
+    // web.php
+Route::get('/cart/status', [DirectSaleController::class, 'status']);
+
+
 });
 
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
@@ -160,9 +173,33 @@ Route::prefix('livreur')->middleware(['auth'])->group(function () {
 
 
 
-Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
-    ->name('admin.dashboard');
+Route::get('/sales/dashboard', [SaleDashboardController::class, 'index'])
+    ->name('sale.dashboard');
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('admin/direct-sales', [DirectSaleController::class, 'index'])->name('admin.direct_sales.index');
+    Route::get('sales/vente', [DirectSaleController::class, 'vente'])->name('sale.direct_sales.vente');
+    Route::get('/direct-sales/create', [DirectSaleController::class, 'create'])->name('direct_sales.create');
+    Route::post('/direct-sales', [DirectSaleController::class, 'store'])->name('sale.direct_sales');
+});
+
+// routes/web.php
+Route::middleware(['auth'])->group(function () {
+    Route::get('sales/dashboard/products', [ProductController::class, 'index'])->name('sale.products.index');
+    Route::get('sales/dashboard/product/search', [ProductController::class, 'search'])->name('sale.products.search');
+    Route::get('sales/dashboard/categories', [CategoryController::class, 'index'])->name('sale.categories.index');
+    Route::get('sales/dashboard/categories/product/{product}', [CategoryController::class, 'showproduct'])->name('sale.categories.showproduct');
+    // Route::get('/dashboard/panier', [SaleDashboardController::class, 'panier'])->name('client.panier');
+  
+    Route::get('/dashboard/shop', [SaleDashboardController::class, 'shop'])->name('client.shop');
+    Route::get('/dashboard/recompense', [LoyaltyPointController::class, 'index'])->name('client.loyalty.index');
+    Route::get('/menu-counts', [SaleDashboardController::class, 'counts'])->name('menu.counts');
+    Route::get('/dashboard/orders/{id}', [SaleDashboardController::class, 'ordershow'])->name('client.ordershow');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/sales/mes-ventes', [SaleDashboardController::class, 'sales'])->name('sale.ventes');
+});
 
 
 

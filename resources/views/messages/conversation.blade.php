@@ -1,4 +1,4 @@
-@extends('layouts.apli')
+@extends('layouts.sales.sale')
 
 @section('content')
 <style>

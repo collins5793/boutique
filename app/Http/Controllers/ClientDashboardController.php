@@ -199,8 +199,8 @@ public function panier()
 
 public function shop(Request $request)
 {
-    $query = Product::with('variants', 'category')->where('status', 'active');
-
+$query = Product::with('variants', 'category', 'discounts')
+                ->where('status', 'active');
     // Recherche
     if ($request->has('search') && $request->search != '') {
         $search = $request->search;
