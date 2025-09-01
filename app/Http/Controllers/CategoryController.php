@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
+use App\Models\OrderItem;
+use App\Models\DirectSaleItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -10,18 +13,47 @@ use Illuminate\Validation\Rule;
 class CategoryController extends Controller
 {
     public function index()
-    {
-        $categories = Category::with('parent', 'children')
-            ->whereNull('parent_id')
-            ->paginate(10);
+{
+    $categories = Category::with('parent', 'products')
+        ->whereNull('parent_id')
+        ->paginate(10);
 
-        return view('categories.index', compact('categories'));
+    $totalProducts = Product::count();
+    $totalActiveProducts = Product::where('status', 'active')->count();
+
+    // Calcul revenu total depuis orders + direct_sales
+    $totalRevenueOrders = OrderItem::sum('total');
+    $totalRevenueDirectSales = DirectSaleItem::sum('total_price');
+    $totalRevenue = $totalRevenueOrders + $totalRevenueDirectSales;
+
+    // Pour chaque catégorie : nb produits, stock total, CA
+    foreach ($categories as $category) {
+        $category->products_count = $category->products->count();
+        $category->total_stock = $category->products->sum('stock_quantity');
+
+        // Revenu par catégorie depuis commandes
+        $revenueOrders = OrderItem::whereIn('product_id', $category->products->pluck('id'))
+            ->sum('total');
+
+        // Revenu par catégorie depuis ventes directes
+        $revenueDirectSales = DirectSaleItem::whereIn('product_id', $category->products->pluck('id'))
+            ->sum('total_price');
+
+        $category->total_revenue = $revenueOrders + $revenueDirectSales;
     }
+
+    return view('sale.categories.index', compact(
+        'categories', 
+        'totalProducts', 
+        'totalActiveProducts', 
+        'totalRevenue'
+    ));
+}
 
     public function create()
     {
         $parentCategories = Category::whereNull('parent_id')->get();
-        return view('categories.create', compact('parentCategories'));
+        return view('sale.categories.create', compact('parentCategories'));
     }
 
     public function store(Request $request)
@@ -39,7 +71,7 @@ class CategoryController extends Controller
             'description' => $request->description
         ]);
 
-        return redirect()->route('categories.index')->with('success', 'Catégorie créée avec succès');
+        return redirect()->route('sale.categories.index')->with('success', 'Catégorie créée avec succès');
     }
 
     public function show(Category $category)
@@ -48,8 +80,15 @@ class CategoryController extends Controller
             ->where('id', '!=', $category->id)
             ->get();
 
-        return view('categories.show', compact('category','parentCategories'));
+        return view('sale.categories.show', compact('category','parentCategories'));
     }
+
+        public function showproduct(Product $product)
+{
+    $product->load(['discounts', 'variants', 'category']);
+    return view('sale.categories.showproduct', compact('product'));
+}
+
 
     public function edit(Category $category)
     {
@@ -57,7 +96,7 @@ class CategoryController extends Controller
             ->where('id', '!=', $category->id)
             ->get();
 
-        return view('categories.edit', compact('category', 'parentCategories'));
+        return view('sale.categories.edit', compact('category', 'parentCategories'));
     }
 
     public function update(Request $request, Category $category)
@@ -79,18 +118,18 @@ class CategoryController extends Controller
             'description' => $request->description
         ]);
 
-        return redirect()->route('categories.index')->with('success', 'Catégorie mise à jour avec succès');
+        return redirect()->route('sale.categories.index')->with('success', 'Catégorie mise à jour avec succès');
     }
 
     public function destroy(Category $category)
     {
         $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Catégorie supprimée avec succès');
+        return redirect()->route('sale.categories.index')->with('success', 'Catégorie supprimée avec succès');
     }
 
     public function productsByCategory(Category $category)
     {
         $products = $category->products()->paginate(12);
-        return view('categories.products', compact('category', 'products'));
+        return view('sale.categories.product', compact('category', 'products'));
     }
 }
