@@ -22,10 +22,20 @@ class Product extends Model
         'gallery',
         'status'
     ];
+    
 
     protected $casts = [
         'gallery' => 'array'
     ];
+
+    public function discounts() {
+    return $this->hasMany(ProductDiscount::class);
+}
+
+public function salesItems()
+    {
+        return $this->hasMany(DirectSaleItem::class);
+    }
 
     public function category(): BelongsTo
     {
@@ -46,5 +56,15 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariant::class);
     }
+
+    public function orderItems()
+{
+    return $this->hasMany(OrderItem::class);
+}
+
+public function directSaleItems()
+{
+    return $this->hasMany(DirectSaleItem::class);
+}
 
 }

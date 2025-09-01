@@ -1,4 +1,4 @@
-@extends('layouts.apli')
+@extends('layouts.sales.sale')
 @section('content')
 <div class="container py-4">
     <h3>📨 Boîte de réception</h3>

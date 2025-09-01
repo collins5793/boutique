@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\OrderItem;
+use App\Models\DirectSaleItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -11,25 +13,70 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Product::with('category');
+{
+    $query = Product::with('category');
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%'.$request->search.'%')
-                  ->orWhere('description', 'like', '%'.$request->search.'%');
-        }
-
-        $products = $query->paginate(10);
-        return view('products.index', compact('products'));
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('name', 'like', '%'.$request->search.'%')
+              ->orWhere('description', 'like', '%'.$request->search.'%');
+        });
     }
+
+    $products = $query->paginate(10);
+
+    // Statistiques
+    $topProductOverall = Product::withSum('orderItems', 'quantity')
+        ->withSum('directSaleItems', 'quantity')
+        ->get()
+        ->map(function($p){
+            $p->total_sold = ($p->order_items_sum_quantity ?? 0) + ($p->direct_sale_items_sum_quantity ?? 0);
+            return $p;
+        })
+        ->sortByDesc('total_sold')
+        ->first();
+
+    $topProductOrder = Product::withSum('orderItems', 'quantity')
+        ->orderByDesc('order_items_sum_quantity')
+        ->first();
+
+    $topProductDirect = Product::withSum('directSaleItems', 'quantity')
+        ->orderByDesc('direct_sale_items_sum_quantity')
+        ->first();
+
+    $stats = [
+        'total' => Product::count(),
+        'in_stock' => Product::where('stock_quantity', '>', 0)->count(),
+        'out_of_stock' => Product::where('stock_quantity', '<=', 0)->count(),
+        'top_product_overall' => $topProductOverall,
+        'top_product_order' => $topProductOrder,
+        'top_product_direct' => $topProductDirect,
+    ];
+
+    return view('sale.products.index', compact('products', 'stats'));
+}
+
+public function search(Request $request)
+{
+    $q = $request->get('q');
+
+    $products = Product::with('category')
+        ->when($q, function ($query, $q) {
+            return $query->where('name', 'like', "%$q%")
+                         ->orWhere('description', 'like', "%$q%");
+        })
+        ->paginate(10);
+
+    return view('sale.products.index', compact('products'));
+}
 
     public function create()
     {
         $categories = Category::all();
-        return view('products.create', compact('categories'));
+        return view('sale.products.create', compact('categories'));
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
 {
     $request->validate([
         'category_id' => 'required|exists:categories,id',
@@ -40,17 +87,19 @@ class ProductController extends Controller
         'stock_quantity' => 'required|integer|min:0',
         'image' => 'nullable|image|max:2048',
         'gallery.*' => 'nullable|image|max:2048',
-        'status' => 'required|in:active,inactive'
+        'status' => 'required|in:active,inactive',
+        'discounts' => 'nullable|array',
+        'discounts.*.min_quantity' => 'required_with:discounts|integer|min:1',
+        'discounts.*.price' => 'required_with:discounts|numeric|min:0',
     ]);
 
-    $data = $request->except(['image', 'gallery']);
+    $data = $request->except(['image', 'gallery', 'discounts']);
     $data['slug'] = Str::slug($request->name);
 
-    // ✅ Génération d’un barcode unique prod-XXXXXXXXXX
+    // Génération d’un barcode unique
     do {
-        $barcode = 'prod-' . Str::upper(Str::random(10)); // 10 caractères aléatoires
+        $barcode = 'prod-' . Str::upper(Str::random(10));
     } while (Product::where('barcode', $barcode)->exists());
-
     $data['barcode'] = $barcode;
 
     if ($request->hasFile('image')) {
@@ -65,20 +114,31 @@ class ProductController extends Controller
         $data['gallery'] = json_encode($gallery);
     }
 
-    Product::create($data);
+    $product = Product::create($data);
 
-    return redirect()->route('products.index')->with('success', 'Produit créé avec succès');
+    // Gestion des réductions
+    $discounts = $request->input('discounts', []);
+    foreach ($discounts as $d) {
+        if (!empty($d['min_quantity']) && !empty($d['price'])) {
+            $product->discounts()->create([
+                'min_quantity' => $d['min_quantity'],
+                'price' => $d['price'],
+            ]);
+        }
+    }
+
+    return redirect()->route('sale.products.index')->with('success', 'Produit créé avec succès');
 }
 
     public function show(Product $product)
-    {
-        return view('products.show', compact('product'));
-    }
-
+{
+    $product->load(['discounts', 'variants', 'category']);
+    return view('sale.products.show', compact('product'));
+}
     public function edit(Product $product)
     {
         $categories = Category::all();
-        return view('products.edit', compact('product', 'categories'));
+        return view('sale.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
@@ -92,16 +152,19 @@ class ProductController extends Controller
         'stock_quantity' => 'required|integer|min:0',
         'image' => 'nullable|image|max:2048',
         'gallery.*' => 'nullable|image|max:2048',
-        'status' => 'required|in:active,inactive'
+        'status' => 'required|in:active,inactive',
+        'discounts' => 'nullable|array',
+        'discounts.*.min_quantity' => 'required_with:discounts|integer|min:1',
+        'discounts.*.price' => 'required_with:discounts|numeric|min:0',
     ]);
 
-    $data = $request->except(['image', 'gallery', 'removed_gallery_images', 'remove_image']);
+    $data = $request->except(['image', 'gallery', 'removed_gallery_images', 'remove_image', 'discounts']);
 
     if ($request->filled('name') && $request->name !== $product->name) {
         $data['slug'] = Str::slug($request->name);
     }
 
-    // Mise à jour image principale
+    // Image principale
     if ($request->hasFile('image')) {
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
@@ -117,10 +180,8 @@ class ProductController extends Controller
         $data['image'] = null;
     }
 
-    // Gestion de la galerie
+    // Gestion galerie
     $currentGallery = $product->gallery ? json_decode($product->gallery, true) : [];
-
-    // Supprimer certaines images
     if ($request->filled('removed_gallery_images')) {
         $removedImages = explode(',', $request->removed_gallery_images);
         foreach ($removedImages as $image) {
@@ -128,21 +189,29 @@ class ProductController extends Controller
         }
         $currentGallery = array_diff($currentGallery, $removedImages);
     }
-
-    // Ajouter de nouvelles images à la galerie
     if ($request->hasFile('gallery')) {
         foreach ($request->file('gallery') as $file) {
             $currentGallery[] = $file->store('products/gallery', 'public');
         }
     }
-
-    $data['gallery'] = json_encode(array_values($currentGallery)); // réindexer proprement
+    $data['gallery'] = json_encode(array_values($currentGallery));
 
     $product->update($data);
 
-    return redirect()->route('products.index')->with('success', 'Produit mis à jour avec succès');
-}
+    // Gestion réductions
+    $product->discounts()->delete(); // supprime anciennes
+    $discounts = $request->input('discounts', []);
+    foreach ($discounts as $d) {
+        if (!empty($d['min_quantity']) && !empty($d['price'])) {
+            $product->discounts()->create([
+                'min_quantity' => $d['min_quantity'],
+                'price' => $d['price'],
+            ]);
+        }
+    }
 
+    return redirect()->route('sale.products.index')->with('success', 'Produit mis à jour avec succès');
+}
 
 
 public function getActiveProductsByCategory()
@@ -177,6 +246,6 @@ public function getActiveProductsByCategory()
         }
 
         $product->delete();
-        return redirect()->route('products.index')->with('success', 'Produit supprimé avec succès');
+        return redirect()->route('sale.products.index')->with('success', 'Produit supprimé avec succès');
     }
 }
