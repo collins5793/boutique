@@ -287,12 +287,235 @@
         color: #94a3b8;
         font-style: italic;
     }
-</style>
+
+
+        .today-summary {
+            margin-bottom: 30px;
+            
+        }
+        .container-summary {
+            display: flex;
+            align-items: center; /* aligne verticalement */
+            gap: 10px; /* espace entre les éléments */
+            margin-bottom: 2rem;
+        }
+
+        .today-summary .card {
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            overflow: hidden;
+            background: var(--light);
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .today-summary .card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .today-summary .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .today-summary .card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .today-summary .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .today-summary .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .today-summary .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .today-summary .card h6 {
+            color: var(--dark-light);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .today-summary .card h6::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .today-summary .card:hover h6::after {
+            width: 100%;
+        }
+
+        .today-summary .card .h4 {
+            color: var(--dark);
+            font-weight: 700;
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .today-summary .card:hover .h4 {
+            color: var(--primary);
+        }
+
+        .today-summary .card small {
+            color: var(--dark-light);
+            font-size: 0.8rem;
+        }
+
+        .today-summary .card .text-danger {
+            color: #e74c3c !important;
+            position: relative;
+        }
+
+        .today-summary .card .text-danger::after {
+            content: '⚠️';
+            margin-left: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        .today-summary .card ul {
+            margin-top: 10px;
+        }
+
+        .today-summary .card ul li {
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.85rem;
+            animation: slideInRight 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .today-summary .card ul li:nth-child(1) {
+            animation-delay: 0.4s;
+        }
+
+        .today-summary .card ul li:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .today-summary .card ul li:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        .today-summary .card ul li:last-child {
+            border-bottom: none;
+        }
+
+        .today-summary .card ul li strong {
+            color: var(--dark);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .today-summary {
+                flex-direction: column;
+            }
+            
+            .today-summary .card {
+                margin-bottom: 15px;
+                min-width: auto;
+            }
+        }
+    </style>
+
+        
+
+ 
+
 
 <div class="container">
     <div class="dashboard-header">
         <h1><i class="fas fa-chart-line"></i> Mes ventes</h1>
     </div>
+<div class="today-summary d-flex gap-3">
+    <div class="container-summary">
+        <div class="card p-3">
+                <h6>Aujourd'hui — Total</h6>
+                <div class="h4">{{ number_format($todayTotal, 0, ',', ' ') }} FCFA</div>
+                <small>{{ $todaySalesCount }} ventes • {{ $todayProductsSold }} articles</small>
+            </div>
+
+            <div class="card p-3">
+                <h6>Montant cash à déposer</h6>
+                    <div class="h4 text-danger">{{ number_format($cashToDeposit, 0, ',', ' ') }} FCFA</div>
+                <small>Vérifier la caisse</small>
+            </div>
+    </div>
+            
+
+            <div class="card p-3">
+                <h6>Répartition paiements (aujourd'hui)</h6>
+                <ul class="list-unstyled mb-0">
+                    @foreach($todayPaymentBreakdown ?? [] as $method => $row)
+                        <li><strong>{{ $method }}</strong> : {{ number_format($row->total,0,',',' ') }} FCFA ({{ $row->count }} ventes)</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    <!-- Résumé rapide aujourd'hui -->
 
     <!-- 🔹 Résumé -->
     <div class="stats-grid">
@@ -312,6 +535,7 @@
             <p>Top produit</p>
         </div>
     </div>
+
 
     <!-- 🔹 Graphiques -->
     <div class="charts-grid">
@@ -557,5 +781,16 @@
         });
     });
 </script>
-
+   <script>
+        // Réanimation au survol
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
 @endsection
