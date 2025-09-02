@@ -84,7 +84,7 @@ $processingCount = Order::where('user_id', $user->id)
                     <a href="{{ route('client.panier') }}" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
                         <div class="menu-text">Panier</div>
-                        <div class="badge" id="cartCount">0</div>
+                        <div class="badge" id="cartCount">{{ $cartCount}}</div>
                         <div class="tooltip">Panier</div>
                     </a>
                 </li>
