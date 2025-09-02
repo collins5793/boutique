@@ -57,6 +57,13 @@ Route::get('products-search', [ProductController::class, 'index'])
 Route::get('/shop', [ProductController::class, 'getActiveProductsByCategory'])->name('shop.index');
 
 
+use App\Http\Controllers\ShopController;
+
+Route::prefix('shop')->group(function () {
+    Route::get('/', [ShopController::class, 'index'])->name('shop.index');
+    Route::get('/{id}', [ShopController::class, 'show'])->name('shop.show');
+    Route::get('/order/{id}', [ShopController::class, 'order'])->name('shop.order');
+});
 
 
 // Route::get('/dashboard', function () {
