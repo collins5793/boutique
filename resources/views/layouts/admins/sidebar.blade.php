@@ -1,7 +1,7 @@
 <div class="sidebar" id="sidebar">
     <div class="logo-container">
-        <div class="logo">B</div>
-        <div class="logo-text">Boutique</div>
+        <div class="logo">A</div>
+        <div class="logo-text">Admin</div>
     </div>
     
     <div class="menu-container">
@@ -27,15 +27,15 @@
                     <div class="badge">3</div>
                     <div class="tooltip">Commandes</div>
                 </li> --}}
-                <li class="menu-item {{ request()->routeIs('sale.products.index') ? 'active' : '' }}">
-                    <a href="{{ route('sale.products.index') }}" class="menu-link">
+                <li class="menu-item {{ request()->routeIs('admin.products.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.products.index') }}" class="menu-link">
                     <div class="menu-icon"><i class="fas fa-box"></i></div>
                     <div class="menu-text">Produits</div>
                     <div class="tooltip">Produits</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->routeIs('sale.categories.index') ? 'active' : '' }}">
-                    <a href="{{ route('sale.categories.index') }}" class="menu-link">
+                <li class="menu-item {{ request()->routeIs('admin.categories.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.categories.index') }}" class="menu-link">
                     <div class="menu-icon"><i class="fas fa-box"></i></div>
                     <div class="menu-text">Catégories</div>
                     <div class="tooltip">Catégories</div>
