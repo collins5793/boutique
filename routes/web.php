@@ -193,7 +193,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('sales/dashboard/categories/product/{product}', [CategoryController::class, 'showproduct'])->name('sale.categories.showproduct');
     // Route::get('/dashboard/panier', [SaleDashboardController::class, 'panier'])->name('client.panier');
   
-    Route::get('/dashboard/shop', [SaleDashboardController::class, 'shop'])->name('client.shop');
+    // Route::get('/dashboard/shop', [SaleDashboardController::class, 'shop'])->name('client.shop');
     Route::get('/dashboard/recompense', [LoyaltyPointController::class, 'index'])->name('client.loyalty.index');
     Route::get('/menu-counts', [SaleDashboardController::class, 'counts'])->name('menu.counts');
     Route::get('/dashboard/orders/{id}', [SaleDashboardController::class, 'ordershow'])->name('client.ordershow');
