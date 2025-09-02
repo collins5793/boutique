@@ -1,107 +1,282 @@
 @extends('layouts.admins.admin')
 
-@section('content')
-<div class="container mx-auto p-4">
+@section('title','📊 Ventes & Commandes')
 
+@section('content')
+<style>
+    :root {
+        --primary: #eb770a;
+        --primary-light: #ec8a2f;
+        --primary-dark: #be6109;
+        --secondary: #007bff;
+        --light: #ffffff;
+        --dark: #1e293b;
+        --muted: #64748b;
+        --radius: 12px;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease-in-out;
+    }
+
+    .page-container {
+        padding: 1.5rem;
+        background: #f8fafc;
+        min-height: calc(100vh - 80px);
+    }
+
+    /* Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .filters-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    .filters-form select,
+    .filters-form input[type="date"] {
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .filters-form button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.6rem 1.2rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .filters-form button:hover {
+        background: var(--primary-dark);
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: var(--light);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        text-align: center;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--dark);
+        transition: var(--transition);
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .kpi-card span {
+        display: block;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-top: 0.5rem;
+        color: var(--primary);
+    }
+
+    /* Graphiques */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: var(--light);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1rem;
+    }
+
+    /* Tableau */
+    .table-container {
+        background: var(--light);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1rem;
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .data-table thead {
+        background: #f1f5f9;
+    }
+
+    .data-table thead th {
+        text-align: left;
+        padding: 0.8rem;
+        font-weight: 600;
+        color: var(--muted);
+    }
+
+    .data-table tbody td {
+        padding: 0.8rem;
+        border-bottom: 1px solid #e2e8f0;
+        color: var(--dark);
+    }
+
+    .data-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-paid { background: #16a34a; color: white; }
+    .badge-pending { background: #facc15; color: #1e293b; }
+    .badge-cancelled { background: #dc2626; color: white; }
+
+    .link-details {
+        color: var(--secondary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .link-details:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="page-container">
     <!-- Header & Filtres -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">📊 Ventes & Commandes</h1>
-        <form method="GET" class="flex gap-2">
-            <select name="type" class="border rounded p-2">
+    <div class="page-header">
+        <h1>📊 Ventes & Commandes</h1>
+        <form method="GET" class="filters-form">
+            <select name="type">
                 <option value="">Tous les types</option>
                 <option value="direct">Ventes Directes</option>
                 <option value="order">Commandes</option>
             </select>
-            <select name="status" class="border rounded p-2">
+            <select name="status">
                 <option value="">Tous statuts</option>
                 <option value="pending">En attente</option>
                 <option value="paid">Payé</option>
                 <option value="cancelled">Annulé</option>
             </select>
-            <select name="payment_method" class="border rounded p-2">
+            <select name="payment_method">
                 <option value="">Méthode de paiement</option>
                 <option value="cash_on_delivery">Cash</option>
                 <option value="mobile_money">Mobile Money</option>
                 <option value="card">Carte</option>
             </select>
-            <input type="date" name="start_date" class="border rounded p-2">
-            <input type="date" name="end_date" class="border rounded p-2">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filtrer</button>
+            <input type="date" name="start_date">
+            <input type="date" name="end_date">
+            <button type="submit">Filtrer</button>
         </form>
     </div>
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-5 gap-4 mb-6">
-        <div class="bg-white shadow rounded p-4 text-center">💵<br>Total Ventes Directes: {{ $kpi['total_direct_sales'] }} </div>
-        <div class="bg-white shadow rounded p-4 text-center">🚚<br>Total Commandes: {{ $kpi['total_orders'] }} </div>
-        <div class="bg-white shadow rounded p-4 text-center">⏳<br>Commandes en attente: {{ $kpi['pending_orders'] }} </div>
-        <div class="bg-white shadow rounded p-4 text-center">❌<br>Commandes annulées: {{ $kpi['cancelled_orders'] }} </div>
-        <div class="bg-white shadow rounded p-4 text-center">📦<br>Produits vendus: {{ $kpi['total_products_sold'] }} </div>
+    <div class="kpi-grid">
+        <div class="kpi-card">💵 Total Ventes Directes <span>{{ $kpi['total_direct_sales'] }}</span></div>
+        <div class="kpi-card">🚚 Total Commandes <span>{{ $kpi['total_orders'] }}</span></div>
+        <div class="kpi-card">⏳ En attente <span>{{ $kpi['pending_orders'] }}</span></div>
+        <div class="kpi-card">❌ Annulées <span>{{ $kpi['cancelled_orders'] }}</span></div>
+        <div class="kpi-card">📦 Produits vendus <span>{{ $kpi['total_products_sold'] }}</span></div>
     </div>
 
     <!-- Graphiques -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-        <div class="bg-white shadow rounded p-4 h-64">
+    <div class="charts-grid">
+        <div class="chart-card">
             <canvas id="salesChart"></canvas>
         </div>
-        {{-- <div class="bg-white shadow rounded p-4 h-64 flex items-center justify-center">Répartition paiement</div>
-        <div class="bg-white shadow rounded p-4 h-64 flex items-center justify-center">Autres KPIs</div> --}}
     </div>
 
     <!-- Tableau détaillé -->
-    <div class="bg-white shadow rounded p-4">
-        <table class="min-w-full table-auto">
+    <div class="table-container">
+        <table class="data-table">
             <thead>
-                <tr class="bg-gray-100">
-                    <th class="px-4 py-2">Type</th>
-                    <th class="px-4 py-2">Numéro</th>
-                    <th class="px-4 py-2">Client</th>
-                    <th class="px-4 py-2">Produits</th>
-                    <th class="px-4 py-2">Montant</th>
-                    <th class="px-4 py-2">Méthode</th>
-                    <th class="px-4 py-2">Statut</th>
-                    <th class="px-4 py-2">Date</th>
-                    <th class="px-4 py-2">Action</th>
+                <tr>
+                    <th>Type</th>
+                    <th>Numéro</th>
+                    <th>Client</th>
+                    <th>Produits</th>
+                    <th>Montant</th>
+                    <th>Méthode</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($directSales as $sale)
                 <tr>
-                    <td class="border px-4 py-2">Directe</td>
-                    <td class="border px-4 py-2">{{ $sale->id }}</td>
-                    <td class="border px-4 py-2">Vente Comptoir</td>
-                    <td class="border px-4 py-2">
+                    <td>Directe</td>
+                    <td>{{ $sale->id }}</td>
+                    <td>Vente Comptoir</td>
+                    <td>
                         @foreach($sale->items as $item)
                             {{ $item->product->name }} ({{ $item->quantity }})<br>
                         @endforeach
                     </td>
-                    <td class="border px-4 py-2">{{ $sale->total }}</td>
-                    <td class="border px-4 py-2">{{ $sale->payment_method }}</td>
-                    <td class="border px-4 py-2">Payé</td>
-                    <td class="border px-4 py-2">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
-                    <td class="border px-4 py-2">
-                        <a href="#" class="text-blue-500">Détails</a>
-                    </td>
+                    <td>{{ $sale->total }}</td>
+                    <td>{{ $sale->payment_method }}</td>
+                    <td><span class="badge badge-paid">Payé</span></td>
+                    <td>{{ $sale->created_at->format('d/m/Y H:i') }}</td>
+                    <td><a href="#" class="link-details">Détails</a></td>
                 </tr>
                 @endforeach
 
                 @foreach($orders as $order)
                 <tr>
-                    <td class="border px-4 py-2">Commande</td>
-                    <td class="border px-4 py-2">{{ $order->order_number }}</td>
-                    <td class="border px-4 py-2">{{ $order->user->name ?? 'N/A' }}</td>
-                    <td class="border px-4 py-2">
+                    <td>Commande</td>
+                    <td>{{ $order->order_number }}</td>
+                    <td>{{ $order->user->name ?? 'N/A' }}</td>
+                    <td>
                         @foreach($order->items as $item)
                             {{ $item->product->name }} ({{ $item->quantity }})<br>
                         @endforeach
                     </td>
-                    <td class="border px-4 py-2">{{ $order->total_amount }}</td>
-                    <td class="border px-4 py-2">{{ $order->payment_method }}</td>
-                    <td class="border px-4 py-2">{{ ucfirst($order->order_status) }}</td>
-                    <td class="border px-4 py-2">{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                    <td class="border px-4 py-2">
-                        <a href="#" class="text-blue-500">Détails</a>
+                    <td>{{ $order->total_amount }}</td>
+                    <td>{{ $order->payment_method }}</td>
+                    <td>
+                        @if($order->order_status === 'pending')
+                            <span class="badge badge-pending">En attente</span>
+                        @elseif($order->order_status === 'cancelled')
+                            <span class="badge badge-cancelled">Annulé</span>
+                        @else
+                            <span class="badge badge-paid">{{ ucfirst($order->order_status) }}</span>
+                        @endif
                     </td>
+                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                    <td><a href="#" class="link-details">Détails</a></td>
                 </tr>
                 @endforeach
             </tbody>
@@ -113,7 +288,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 const ctx = document.getElementById('salesChart').getContext('2d');
-const salesChart = new Chart(ctx, {
+new Chart(ctx, {
     type: 'line',
     data: {
         labels: {!! json_encode($salesEvolution['dates']) !!},
@@ -122,19 +297,28 @@ const salesChart = new Chart(ctx, {
                 label: 'Ventes Directes',
                 data: {!! json_encode($salesEvolution['direct_sales']) !!},
                 borderColor: 'rgba(75, 192, 192, 1)',
-                fill: false
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.3,
+                fill: true
             },
             {
                 label: 'Commandes',
                 data: {!! json_encode($salesEvolution['orders']) !!},
                 borderColor: 'rgba(255, 99, 132, 1)',
-                fill: false
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                tension: 0.3,
+                fill: true
             }
         ]
     },
     options: {
         responsive: true,
-        plugins: { legend: { position: 'top' } }
+        plugins: { legend: { position: 'top' } },
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+            x: { ticks: { color: '#64748b' } },
+            y: { ticks: { color: '#64748b' } }
+        }
     }
 });
 </script>

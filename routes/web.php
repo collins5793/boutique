@@ -237,6 +237,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('admin.dashboard');
     Route::get('dashboard/sales-orders', [AdminDashboardController::class, 'salesOrders'])
     ->name('admin.sales_orders');
+    Route::get('admin/dashboard/products', [ProductController::class, 'indexa'])->name('admin.products.index');
+    Route::get('admin/dashboard/product/search', [ProductController::class, 'searcha'])->name('admin.products.search');
+    Route::get('admin/dashboard/categories', [CategoryController::class, 'indexa'])->name('admin.categories.index');
+    Route::get('admin/dashboard/categories/product/{product}', [CategoryController::class, 'showproducta'])->name('admin.categories.showproduct');
 });
 
 
