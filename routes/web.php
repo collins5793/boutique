@@ -20,6 +20,8 @@ use App\Http\Controllers\ClientDashboardController;
 use App\Http\Controllers\SaleDashboardController;
 use App\Http\Controllers\DirectSaleController;
 use App\Http\Controllers\DirectSaleCartController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ClientController;
 
 
 
@@ -220,6 +222,31 @@ Route::prefix('admin/messages')->middleware('auth')->group(function () {
 
 
 
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+        ->name('admin.dashboard');
+    Route::get('dashboard/sales-orders', [AdminDashboardController::class, 'salesOrders'])
+    ->name('admin.sales_orders');
+});
+
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/clients', [ClientController::class, 'index'])->name('admin.clients');
+    Route::get('/clients/{id}', [ClientController::class, 'show'])->name('admin.clients.show');
+    Route::post('/clients/{id}/toggle-status', [ClientController::class, 'toggleStatus'])->name('admin.clients.toggleStatus');
+    Route::get('/clients/export/csv', [ClientController::class, 'exportCSV'])->name('admin.clients.export.csv');
+    Route::get('/clients/export/pdf', [ClientController::class, 'exportPDF'])->name('admin.clients.export.pdf');
+});
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/inventory', [AdminDashboardController::class, 'inventaire'])->name('admin.inventory');
+    Route::get('/inventory/{id}', [AdminDashboardController::class, 'show'])->name('admin.inventory.show');
+    Route::get('/inventory/export/csv', [AdminDashboardController::class, 'exportCSV'])->name('admin.inventory.export.csv');
+    Route::get('/inventory/export/pdf', [AdminDashboardController::class, 'exportPDF'])->name('admin.inventory.export.pdf');
+});
 
 
 
