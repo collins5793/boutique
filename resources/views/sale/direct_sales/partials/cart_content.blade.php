@@ -393,145 +393,7 @@
             console.log("Panier rafraîchi");
         }
         
-        // Supprimer un produit
-        document.querySelectorAll(".deleteProductBtn").forEach(btn => {
-            btn.addEventListener("click", function(e) {
-                e.preventDefault();
-                let id = this.dataset.id;
-                const item = this.closest('.cart-item');
-                
-                // Animation de suppression
-                item.style.transform = 'translateX(100px)';
-                item.style.opacity = '0';
-                item.style.transition = 'all 0.3s ease';
-                
-                setTimeout(() => {
-                    fetch(`/cart/remove/${id}`, {
-                        method: "DELETE",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Accept": "application/json"
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        item.remove();
-                        showNotification(data.message, 'success');
-                        if (document.querySelectorAll('.cart-item').length === 0) {
-                            location.reload();
-                        }
-                        refreshCart();
-                    })
-                    .catch(err => console.error(err));
-                }, 300);
-            });
-        });
-
-        // Vider le panier
-        document.getElementById("clearCartBtn").addEventListener("click", function() {
-            if(!confirm("Voulez-vous vraiment vider le panier ?")) return;
-            
-            const items = document.querySelectorAll('.cart-item');
-            items.forEach((item, index) => {
-                setTimeout(() => {
-                    item.style.transform = 'translateX(100px)';
-                    item.style.opacity = '0';
-                }, index * 100);
-            });
-            
-            setTimeout(() => {
-                fetch('/cart/clear', {
-                    method: "DELETE",
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        "Accept": "application/json"
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    showNotification(data.message, 'success');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 500);
-                })
-                .catch(err => console.error(err));
-            }, items.length * 100 + 300);
-        });
-
-        // Augmenter quantité
-        document.querySelectorAll(".increaseQty").forEach(btn => {
-            btn.addEventListener("click", function() {
-                let id = this.dataset.id;
-                let countElement = document.getElementById(`count-${id}`);
-                let currentCount = parseInt(countElement.textContent);
-                countElement.textContent = currentCount + 1;
-                
-                updateTotals();
-                
-                // Envoyer la mise à jour au serveur
-                fetch(`/cart/update/${id}`, {
-                    method: "PUT",
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify({ action: "increase" })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.success) {
-                        // Revenir à l'ancienne valeur en cas d'erreur
-                        countElement.textContent = currentCount;
-                        updateTotals();
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    countElement.textContent = currentCount;
-                    updateTotals();
-                });
-            });
-        });
-
-        // Diminuer quantité
-        document.querySelectorAll(".decreaseQty").forEach(btn => {
-            btn.addEventListener("click", function() {
-                let id = this.dataset.id;
-                let countElement = document.getElementById(`count-${id}`);
-                let currentCount = parseInt(countElement.textContent);
-                
-                if (currentCount > 1) {
-                    countElement.textContent = currentCount - 1;
-                    updateTotals();
-                    
-                    // Envoyer la mise à jour au serveur
-                    fetch(`/cart/update/${id}`, {
-                        method: "PUT",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json",
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify({ action: "decrease" })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (!data.success) {
-                            // Revenir à l'ancienne valeur en cas d'erreur
-                            countElement.textContent = currentCount;
-                            updateTotals();
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        countElement.textContent = currentCount;
-                        updateTotals();
-                    });
-                }
-            });
-        });
-
+        
         // Fonction pour recalculer le total
         function updateTotals() {
             let subtotal = 0;
@@ -602,45 +464,54 @@
             }, 3000);
         }
 
-        // Gestion du processus de commande
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        const paymentPopup = document.getElementById('paymentChoicePopup');
+        // Gestion du processus de commande avec délégation
+document.addEventListener("click", function(e) {
+    if (e.target.closest("#checkoutBtn")) {
+        showPopup("paymentChoicePopup");
+    }
+});
 
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', () => {
-                showPopup('paymentChoicePopup');
-            });
-        }
+// Fermer les popups
+document.addEventListener("click", function(e) {
+    if (e.target.closest("#closePopup")) {
+        hidePopup("paymentChoicePopup");
+    }
+});
 
-        // Fermer les popups
-        document.getElementById('closePopup').addEventListener('click', () => {
-            hidePopup('paymentChoicePopup');
-        });
+// Boutons paiement
+document.addEventListener("click", function(e) {
+    if (e.target.closest("#cashOnDeliveryBtn")) {
+        passerCommande("cash");
+    }
+    if (e.target.closest("#onlinePaymentBtn")) {
+        passerCommande("mobile_money");
+    }
+});
 
-        // Boutons paiement
-        document.getElementById('cashOnDeliveryBtn').addEventListener('click', () => {
-            passerCommande('cash');
-        });
-
-        document.getElementById('onlinePaymentBtn').addEventListener('click', () => {
-            passerCommande('mobile_money');
-        });
 
         // Passer la commande
-        function passerCommande(paymentMethod) {
-            // Afficher un indicateur de charnement
-            showNotification("Traitement de votre commande...", 'success');
-            
-            // Simuler un appel API
-            setTimeout(() => {
-                hidePopup('paymentChoicePopup');
-                showNotification("Commande passée avec succès!", 'success');
-                
-                // Redirection vers une page de confirmation
-                setTimeout(() => {
-                    window.location.href = "/order/confirmation";
-                }, 1500);
-            }, 2000);
-        }
+        function passerCommande(paymentMethod){
+        
+        fetch(`{{ route('sale.direct_sales') }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ 
+                payment_method: paymentMethod, 
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            hidePopup('paymentChoicePopup');
+            showNotification(data.message, data.success ? 'success' : 'error');
+            if(data.success){
+                setTimeout(() => window.location.href = '/sales/vente', 1500);
+            }
+        })
+        .catch(err => console.error("Erreur fetch:", err));
+    }
     });
     </script>

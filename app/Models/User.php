@@ -73,5 +73,22 @@ public function notifications()
     return $this->hasMany(Notification::class);
 }
 
+public function orders()
+{
+    return $this->hasMany(Order::class, 'user_id', 'id');
+}
+
+public function directSales()
+    {
+        return $this->hasMany(DirectSale::class, 'employee_id', 'id');
+    }
+
+    // Relation avec les points de fidélité
+    public function loyaltyPoints()
+    {
+        return $this->hasMany(LoyaltyPoint::class, 'user_id', 'id');
+    }
+
+
 
 }

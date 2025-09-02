@@ -8,24 +8,17 @@
         <div class="menu-section">
             <div class="section-label">Principal</div>
             <ul class="menu">
-                <li class="menu-item {{ request()->routeIs('sale.dashboard') ? 'active' : '' }}">
-                    <a href="{{ route('sale.dashboard') }}" class="menu-link">
+                <li class="menu-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('admin.dashboard') }}" class="menu-link">
                     <div class="menu-icon"><i class="fas fa-home"></i></div>
                     <div class="menu-text">Dashboard</div>
                     <div class="tooltip">Dashboard</div>
                 </li>
-                <li class="menu-item {{ request()->routeIs('sale.direct_sales.vente') ? 'active' : '' }}">
-                    <a href="{{ route('sale.direct_sales.vente') }}" class="menu-link">                    
+                <li class="menu-item {{ request()->routeIs('admin.sales_orders') ? 'active' : '' }}">
+                    <a href="{{ route('admin.sales_orders') }}" class="menu-link">                    
                     <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="menu-text">Vendre</div>
-                    <div class="tooltip">Vendre</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ request()->routeIs('sale.ventes') ? 'active' : '' }}">
-                    <a href="{{ route('sale.ventes') }}" class="menu-link">                    
-                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="menu-text">Mes Ventes</div>
-                    <div class="tooltip">Mes Ventes</div>
+                    <div class="menu-text">Commande / Ventes</div>
+                    <div class="tooltip">Commande / Ventes</div>
                     </a>
                 </li>
                 {{-- <li class="menu-item">
@@ -53,6 +46,34 @@
                     <div class="menu-text">Clients</div>
                     <div class="tooltip">Clients</div>
                 </li> --}}
+                <li class="menu-item {{ request()->routeIs('admin.clients') ? 'active' : '' }}">
+                    <a href="{{ route('admin.clients') }}" class="menu-link">                    
+                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="menu-text">Clients</div>
+                    <div class="tooltip">Clients</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.inventory') ? 'active' : '' }}">
+                    <a href="{{ route('admin.inventory') }}" class="menu-link">                    
+                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="menu-text">Inventaire / Stock</div>
+                    <div class="tooltip">Inventaire / Stock</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('sale.direct_sales.vente') ? 'active' : '' }}">
+                    <a href="{{ route('sale.direct_sales.vente') }}" class="menu-link">                    
+                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="menu-text">Finances</div>
+                    <div class="tooltip">Finances</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('sale.direct_sales.vente') ? 'active' : '' }}">
+                    <a href="{{ route('sale.direct_sales.vente') }}" class="menu-link">                    
+                    <div class="menu-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="menu-text">Employés / Livreurs</div>
+                    <div class="tooltip">Employés / Livreurs</div>
+                    </a>
+                </li>
             </ul>
         </div>
         
